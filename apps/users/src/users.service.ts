@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  OnModuleInit,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { UsersRepository } from './repository/users.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -17,6 +11,8 @@ import {
 } from '@app/common';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
+import { RpcException } from '@nestjs/microservices';
+import { status } from '@grpc/grpc-js';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -30,10 +26,13 @@ export class UsersService implements OnModuleInit {
   async userExists(email: string) {
     try {
       await this.userRepository.findOne({ email });
-    } catch (err) {
+    } catch (e) {
       return;
     }
-    throw new UnprocessableEntityException('Email already exists');
+    throw new RpcException({
+      code: status.ALREADY_EXISTS,
+      message: 'Email already exists',
+    });
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<CreateUserResponse> {
@@ -45,10 +44,6 @@ export class UsersService implements OnModuleInit {
         password: await bcrypt.hash(createUserDto.password, 10),
       });
 
-      if (!userCreated) {
-        throw new Error('Error creating user');
-      }
-
       return {
         user: {
           id: userCreated._id.toString(),
@@ -57,7 +52,10 @@ export class UsersService implements OnModuleInit {
         },
       };
     } catch (err) {
-      throw new Error(err);
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: err.message,
+      });
     }
   }
 
@@ -65,7 +63,10 @@ export class UsersService implements OnModuleInit {
     try {
       const findedUser = await this.userRepository.findOne({ _id });
       if (!findedUser) {
-        throw new NotFoundException('User not found');
+        throw new RpcException({
+          code: status.NOT_FOUND,
+          message: 'User not found',
+        });
       }
 
       return {
@@ -76,7 +77,10 @@ export class UsersService implements OnModuleInit {
         },
       };
     } catch (err) {
-      throw new Error(err);
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: err.message,
+      });
     }
   }
 
@@ -98,7 +102,10 @@ export class UsersService implements OnModuleInit {
         },
       };
     } catch (err) {
-      throw new Error(err);
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: err.message,
+      });
     }
   }
 
@@ -108,7 +115,10 @@ export class UsersService implements OnModuleInit {
 
       return {};
     } catch (err) {
-      throw new Error(err);
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: err.message,
+      });
     }
   }
 
@@ -123,7 +133,10 @@ export class UsersService implements OnModuleInit {
     try {
       return await this.jwtService.verifyAsync(token);
     } catch (err) {
-      throw new BadRequestException('Invalid token: ', err);
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: err.message,
+      });
     }
   }
 
@@ -134,12 +147,18 @@ export class UsersService implements OnModuleInit {
     try {
       const user = await this.userRepository.findOne({ email });
       if (!user) {
-        throw new NotFoundException('User not found');
+        throw new RpcException({
+          code: status.NOT_FOUND,
+          message: "User doesn't exist",
+        });
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        throw new BadRequestException('Invalid password');
+        throw new RpcException({
+          code: status.INTERNAL,
+          message: 'Invalid password',
+        });
       }
 
       const payload = { sub: user._id.toString(), username: user.email };
@@ -147,8 +166,11 @@ export class UsersService implements OnModuleInit {
       return {
         token,
       };
-    } catch (e) {
-      throw new Error(e);
+    } catch (err) {
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: err.message,
+      });
     }
   }
 }

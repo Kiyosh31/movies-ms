@@ -24,7 +24,7 @@ export class UsersService implements OnModuleInit {
   }
 
   updateUser(id: string, updateUserDto: UpdateUserDto) {
-    return this.usersService.updateUser({ id, user: updateUserDto });
+    // return this.usersService.updateUser({ id, user: updateUserDto });
   }
 
   deleteUser(id: string) {
