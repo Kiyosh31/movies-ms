@@ -1,7 +1,6 @@
 import { IsEmail, IsStrongPassword } from 'class-validator';
-import { CreateUserRequest } from '@app/common';
 
-export class CreateUserDto implements CreateUserRequest {
+export class CreateUserDto {
   @IsEmail()
   email: string;
 

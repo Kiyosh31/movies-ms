@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
-import { GatewayController } from './gateway.controller';
-import { GatewayService } from './gateway.service';
 import { ConfigModule } from '@nestjs/config';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
+    UsersModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
   ],
-  controllers: [GatewayController],
-  providers: [GatewayService],
+  controllers: [],
+  providers: [],
 })
 export class GatewayModule {}
