@@ -23,4 +23,4 @@ RUN npm i --prod
 
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD ["node", "dist/apps/gateway/main"]
+CMD ["node", "dist/apps/users/main"]

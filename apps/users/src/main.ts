@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { GatewayModule } from './gateway.module';
+import { UsersModule } from './users.module';
 import { ConfigService } from '@nestjs/config';
 
-const serviceName = 'Gateway';
+const serviceName = 'users';
 
 async function bootstrap() {
-  const app = await NestFactory.create(GatewayModule);
+  const app = await NestFactory.create(UsersModule);
   const configService = app.get(ConfigService);
   const port = configService.getOrThrow<number>('PORT');
 
