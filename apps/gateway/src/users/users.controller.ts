@@ -10,6 +10,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-seru.dto';
+import { AuthenticateRequest } from '@app/common';
 
 @Controller('users')
 export class UsersController {
@@ -33,5 +34,10 @@ export class UsersController {
   @Delete(':id')
   deleteUser(@Param('id') id: string) {
     return this.usersService.deleteUser(id);
+  }
+
+  @Post('/auth')
+  authenticate(@Body() request: AuthenticateRequest) {
+    return this.usersService.authenticate(request.email, request.password);
   }
 }

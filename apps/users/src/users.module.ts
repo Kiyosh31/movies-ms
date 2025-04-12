@@ -12,6 +12,7 @@ import { UsersRepository } from './repository/users.repository';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -40,6 +41,15 @@ import { join } from 'path';
         inject: [ConfigService],
       },
     ]),
+    JwtModule.registerAsync({
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.getOrThrow<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.getOrThrow<string>('JWT_EXPIRE'),
+        },
+      }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [UsersController],
   providers: [UsersService, UsersRepository],

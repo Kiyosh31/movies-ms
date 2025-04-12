@@ -20,14 +20,18 @@ export class UsersService implements OnModuleInit {
   }
 
   getUser(id: string) {
-    return `This action returns a #${id} user`;
+    return this.usersService.getUser({ id });
   }
 
   updateUser(id: string, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user ${updateUserDto.email}`;
+    return this.usersService.updateUser({ id, user: updateUserDto });
   }
 
   deleteUser(id: string) {
-    return `This action removes a #${id} user`;
+    return this.usersService.deleteUser({ id });
+  }
+
+  authenticate(email: string, password: string) {
+    return this.usersService.authenticate({ email, password });
   }
 }

@@ -1,6 +1,8 @@
 import { BadRequestException, Controller } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
+  AuthenticateRequest,
+  AuthenticateResponse,
   CreateUserRequest,
   DeleteUserRequest,
   GetUserRequest,
@@ -32,5 +34,13 @@ export class UsersController implements UsersServiceController {
 
   deleteUser(request: DeleteUserRequest) {
     return this.usersService.deleteUser(request.id);
+  }
+
+  authenticate(request: AuthenticateRequest) {
+    if (!request.email || !request.password) {
+      throw new BadRequestException('Invalid user data');
+    }
+
+    return this.usersService.authenticate(request.email, request.password);
   }
 }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   OnModuleInit,
@@ -8,16 +9,21 @@ import { UsersRepository } from './repository/users.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
+  AuthenticateResponse,
   CreateUserResponse,
   DeleteUserResponse,
   GetUserResponse,
   UpdateUserResponse,
 } from '@app/common';
 import * as bcrypt from 'bcryptjs';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
-  constructor(private readonly userRepository: UsersRepository) {}
+  constructor(
+    private readonly userRepository: UsersRepository,
+    private readonly jwtService: JwtService,
+  ) {}
 
   onModuleInit() {}
 
@@ -98,11 +104,51 @@ export class UsersService implements OnModuleInit {
 
   async deleteUser(_id: string): Promise<DeleteUserResponse> {
     try {
-      const deletedUser = await this.userRepository.findOneAndDelete({ _id });
+      await this.userRepository.findOneAndDelete({ _id });
 
       return {};
     } catch (err) {
       throw new Error(err);
+    }
+  }
+
+  async generateJwt(payload: {
+    sub: string;
+    username: string;
+  }): Promise<string> {
+    return this.jwtService.signAsync(payload);
+  }
+
+  async verifyJwt(token: string): Promise<any> {
+    try {
+      return await this.jwtService.verifyAsync(token);
+    } catch (err) {
+      throw new BadRequestException('Invalid token: ', err);
+    }
+  }
+
+  async authenticate(
+    email: string,
+    password: string,
+  ): Promise<AuthenticateResponse> {
+    try {
+      const user = await this.userRepository.findOne({ email });
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        throw new BadRequestException('Invalid password');
+      }
+
+      const payload = { sub: user._id.toString(), username: user.email };
+      const token = await this.generateJwt(payload);
+      return {
+        token,
+      };
+    } catch (e) {
+      throw new Error(e);
     }
   }
 }

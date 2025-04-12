@@ -34,6 +34,7 @@ export interface GetUserResponse {
 }
 
 export interface UpdateUserRequest {
+  id: string;
   user: User | undefined;
 }
 
@@ -48,6 +49,15 @@ export interface DeleteUserRequest {
 export interface DeleteUserResponse {
 }
 
+export interface AuthenticateRequest {
+  email: string;
+  password: string;
+}
+
+export interface AuthenticateResponse {
+  token: string;
+}
+
 export const USERS_PACKAGE_NAME = "users";
 
 export interface UsersServiceClient {
@@ -58,6 +68,8 @@ export interface UsersServiceClient {
   updateUser(request: UpdateUserRequest): Observable<UpdateUserResponse>;
 
   deleteUser(request: DeleteUserRequest): Observable<DeleteUserResponse>;
+
+  authenticate(request: AuthenticateRequest): Observable<AuthenticateResponse>;
 }
 
 export interface UsersServiceController {
@@ -74,11 +86,15 @@ export interface UsersServiceController {
   deleteUser(
     request: DeleteUserRequest,
   ): Promise<DeleteUserResponse> | Observable<DeleteUserResponse> | DeleteUserResponse;
+
+  authenticate(
+    request: AuthenticateRequest,
+  ): Promise<AuthenticateResponse> | Observable<AuthenticateResponse> | AuthenticateResponse;
 }
 
 export function UsersServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["createUser", "getUser", "updateUser", "deleteUser"];
+    const grpcMethods: string[] = ["createUser", "getUser", "updateUser", "deleteUser", "authenticate"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("UsersService", method)(constructor.prototype[method], method, descriptor);
