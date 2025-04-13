@@ -56,8 +56,8 @@ export class UsersService implements OnModuleInit {
 
   async getUser(_id: string): Promise<User> {
     try {
-      const findedUser = await this.userRepository.findOne({ _id });
-      if (!findedUser) {
+      const foundUser = await this.userRepository.findOne({ _id });
+      if (!foundUser) {
         throw new RpcException({
           code: status.NOT_FOUND,
           message: 'User not found',
@@ -65,12 +65,12 @@ export class UsersService implements OnModuleInit {
       }
 
       return {
-        id: findedUser._id.toString(),
-        firstName: findedUser.firstName,
-        lastName: findedUser.lastName,
-        email: findedUser.email,
-        password: findedUser.password,
-        role: findedUser.role,
+        id: foundUser._id.toString(),
+        firstName: foundUser.firstName,
+        lastName: foundUser.lastName,
+        email: foundUser.email,
+        password: foundUser.password,
+        role: foundUser.role,
       };
     } catch (err) {
       throw new RpcException({

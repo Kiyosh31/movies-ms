@@ -1,12 +1,32 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { MoviesService } from './movies.service';
+import {
+  CreateMovieRequest,
+  DeleteMovieRequest,
+  GetMovieRequest,
+  MoviesServiceController,
+  MoviesServiceControllerMethods,
+  UpdateMovieRequest,
+} from '@app/common';
 
-@Controller()
-export class MoviesController {
+@Controller('movies')
+@MoviesServiceControllerMethods()
+export class MoviesController implements MoviesServiceController {
   constructor(private readonly moviesService: MoviesService) {}
 
-  @Get()
-  getHello(): string {
-    return this.moviesService.getHello();
+  createMovie(request: CreateMovieRequest) {
+    return this.moviesService.createMovie(request);
+  }
+
+  getMovie(request: GetMovieRequest) {
+    return this.moviesService.getMovie(request.id);
+  }
+
+  updateMovie(request: UpdateMovieRequest) {
+    return this.moviesService.updateMovie(request, request.id);
+  }
+
+  deleteMovie(request: DeleteMovieRequest) {
+    return this.moviesService.deleteMovie(request.id);
   }
 }

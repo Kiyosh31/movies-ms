@@ -6,8 +6,8 @@ import { Model } from 'mongoose';
 import { MovieDocument } from '../models/movie.schema';
 
 @Injectable()
-export class UsersRepository extends AbstractRepository<MovieDocument> {
-  protected readonly logger = new Logger(UsersRepository.name);
+export class MovieRepository extends AbstractRepository<MovieDocument> {
+  protected readonly logger = new Logger(MovieRepository.name);
 
   constructor(
     @InjectModel(MovieDocument.name) movieModel: Model<MovieDocument>,

@@ -1,24 +1,13 @@
 import { Module } from '@nestjs/common';
-import { MoviesController } from './movies.controller';
 import { MoviesService } from './movies.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MoviesController } from './movies.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import {
-  DatabaseModule,
-  MOVIES_PACKAGE_NAME,
-  MOVIES_SERVICE_NAME,
-} from '@app/common';
-import { MovieDocument, MovieSchema } from './models/movie.schema';
+import { MOVIES_PACKAGE_NAME, MOVIES_SERVICE_NAME } from '@app/common';
+import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
-import { MovieRepository } from './repository/movie.repository';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    DatabaseModule,
-    DatabaseModule.forFeature([
-      { name: MovieDocument.name, schema: MovieSchema },
-    ]),
     ClientsModule.registerAsync([
       {
         name: MOVIES_SERVICE_NAME,
@@ -27,7 +16,7 @@ import { MovieRepository } from './repository/movie.repository';
           options: {
             package: MOVIES_PACKAGE_NAME,
             protoPath: join(__dirname, '../movies.proto'),
-            url: configService.getOrThrow<string>('GRPC_URI'),
+            url: configService.getOrThrow<string>('MOVIES_GRPC_URI'),
           },
         }),
         inject: [ConfigService],
@@ -35,6 +24,6 @@ import { MovieRepository } from './repository/movie.repository';
     ]),
   ],
   controllers: [MoviesController],
-  providers: [MoviesService, MovieRepository],
+  providers: [MoviesService],
 })
 export class MoviesModule {}

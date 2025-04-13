@@ -52,5 +52,5 @@ nest g app <app name>
 2. Generate `controllers` and `Services` inside Gateway
 
 ```console
-
+nest g resource <resource name>
 ```

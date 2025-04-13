@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -13,9 +14,10 @@ import {
   CreateUserRequest,
   UpdateUserRequest,
 } from '@app/common';
+import { Auth } from '../decorators/user.decorator';
+import { UserOwnerGuard } from '../guards/user-owner.guard';
 
 @Controller('users')
-// @UseGuards(RolesGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -25,7 +27,8 @@ export class UsersController {
   }
 
   @Get(':id')
-  // @Roles(Role.User, Role.Admin)
+  @Auth()
+  // @UseGuards(UserOwnerGuard)
   getUser(@Param('id') id: string) {
     return this.usersService.getUser(id);
   }

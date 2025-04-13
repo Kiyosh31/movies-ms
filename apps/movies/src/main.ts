@@ -10,6 +10,7 @@ const serviceName = 'Movies';
 async function bootstrap() {
   const app = await NestFactory.create(MoviesModule);
   const configService = app.get(ConfigService);
+  const url = configService.getOrThrow<string>('GRPC_URI');
 
   const microserviceApp =
     await NestFactory.createMicroservice<MicroserviceOptions>(MoviesModule, {
@@ -17,12 +18,12 @@ async function bootstrap() {
       options: {
         package: MOVIES_PACKAGE_NAME,
         protoPath: join(__dirname, '../movies.proto'),
-        url: configService.getOrThrow<string>('GRPC_URI'),
+        url,
       },
     });
 
   await microserviceApp.listen();
-  console.log(`[Service ${serviceName}] is listening on port 5001`);
+  console.log(`[Service ${serviceName}] is listening on port ${url}`);
 }
 
 bootstrap().catch((err) => {

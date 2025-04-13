@@ -5,26 +5,16 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Reflector } from '@nestjs/core';
-import { Role, ROLES_KEY } from '../decorators/roles.decorator';
+import { UsersService } from '../users/users.service'; // Assuming you have a UsersService
 
 @Injectable()
-export class RolesGuard implements CanActivate {
+export class JwtAuthGuard implements CanActivate {
   constructor(
-    private jwtService: JwtService,
-    private reflector: Reflector,
+    private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-
-    if (!requiredRoles) {
-      return true; // No roles specified, allow access
-    }
-
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers.authorization;
 
@@ -36,10 +26,15 @@ export class RolesGuard implements CanActivate {
 
     try {
       const payload = await this.jwtService.verifyAsync(token);
-      request['user'] = payload; // Attach the payload to the request for later use
+      const user = this.usersService.getUser(payload.sub);
 
-      return requiredRoles.some((role) => payload.role === role);
-    } catch (error) {
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      request['user'] = user; // Attach user to request
+      return true;
+    } catch (err) {
       throw new UnauthorizedException('Invalid token');
     }
   }
