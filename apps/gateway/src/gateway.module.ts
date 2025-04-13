@@ -4,10 +4,10 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    UsersModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    UsersModule,
   ],
   controllers: [],
   providers: [],

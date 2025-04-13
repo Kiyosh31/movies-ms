@@ -12,34 +12,32 @@ export const protobufPackage = "users";
 
 export interface User {
   id: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
+  role: string;
 }
 
 export interface CreateUserRequest {
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
-}
-
-export interface CreateUserResponse {
-  user: User | undefined;
+  role: string;
 }
 
 export interface GetUserRequest {
   id: string;
 }
 
-export interface GetUserResponse {
-  user: User | undefined;
-}
-
 export interface UpdateUserRequest {
   id: string;
-  user: User | undefined;
-}
-
-export interface UpdateUserResponse {
-  user: User | undefined;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  role: string;
 }
 
 export interface DeleteUserRequest {
@@ -61,11 +59,11 @@ export interface AuthenticateResponse {
 export const USERS_PACKAGE_NAME = "users";
 
 export interface UsersServiceClient {
-  createUser(request: CreateUserRequest): Observable<CreateUserResponse>;
+  createUser(request: CreateUserRequest): Observable<User>;
 
-  getUser(request: GetUserRequest): Observable<GetUserResponse>;
+  getUser(request: GetUserRequest): Observable<User>;
 
-  updateUser(request: UpdateUserRequest): Observable<UpdateUserResponse>;
+  updateUser(request: UpdateUserRequest): Observable<User>;
 
   deleteUser(request: DeleteUserRequest): Observable<DeleteUserResponse>;
 
@@ -73,15 +71,11 @@ export interface UsersServiceClient {
 }
 
 export interface UsersServiceController {
-  createUser(
-    request: CreateUserRequest,
-  ): Promise<CreateUserResponse> | Observable<CreateUserResponse> | CreateUserResponse;
+  createUser(request: CreateUserRequest): Promise<User> | Observable<User> | User;
 
-  getUser(request: GetUserRequest): Promise<GetUserResponse> | Observable<GetUserResponse> | GetUserResponse;
+  getUser(request: GetUserRequest): Promise<User> | Observable<User> | User;
 
-  updateUser(
-    request: UpdateUserRequest,
-  ): Promise<UpdateUserResponse> | Observable<UpdateUserResponse> | UpdateUserResponse;
+  updateUser(request: UpdateUserRequest): Promise<User> | Observable<User> | User;
 
   deleteUser(
     request: DeleteUserRequest,

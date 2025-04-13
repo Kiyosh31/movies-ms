@@ -40,3 +40,17 @@ make dev
 ### Npm
 
 1. `npm run proto:users` this will generate a protobuf file for users microservice
+
+# Nestjs Commands
+
+1. Generate a new microservice
+
+```console
+nest g app <app name>
+```
+
+2. Generate `controllers` and `Services` inside Gateway
+
+```console
+
+```

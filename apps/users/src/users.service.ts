@@ -2,13 +2,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { UsersRepository } from './repository/users.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import {
-  AuthenticateResponse,
-  CreateUserResponse,
-  DeleteUserResponse,
-  GetUserResponse,
-  UpdateUserResponse,
-} from '@app/common';
+import { AuthenticateResponse, DeleteUserResponse, User } from '@app/common';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { RpcException } from '@nestjs/microservices';
@@ -35,7 +29,7 @@ export class UsersService implements OnModuleInit {
     });
   }
 
-  async createUser(createUserDto: CreateUserDto): Promise<CreateUserResponse> {
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     try {
       await this.userExists(createUserDto.email);
 
@@ -45,11 +39,12 @@ export class UsersService implements OnModuleInit {
       });
 
       return {
-        user: {
-          id: userCreated._id.toString(),
-          email: userCreated.email,
-          password: userCreated.password,
-        },
+        id: userCreated._id.toString(),
+        firstName: userCreated.firstName,
+        lastName: userCreated.lastName,
+        email: userCreated.email,
+        password: userCreated.password,
+        role: userCreated.role,
       };
     } catch (err) {
       throw new RpcException({
@@ -59,7 +54,7 @@ export class UsersService implements OnModuleInit {
     }
   }
 
-  async getUser(_id: string): Promise<GetUserResponse> {
+  async getUser(_id: string): Promise<User> {
     try {
       const findedUser = await this.userRepository.findOne({ _id });
       if (!findedUser) {
@@ -70,11 +65,12 @@ export class UsersService implements OnModuleInit {
       }
 
       return {
-        user: {
-          id: findedUser._id.toString(),
-          email: findedUser.email,
-          password: findedUser.password,
-        },
+        id: findedUser._id.toString(),
+        firstName: findedUser.firstName,
+        lastName: findedUser.lastName,
+        email: findedUser.email,
+        password: findedUser.password,
+        role: findedUser.role,
       };
     } catch (err) {
       throw new RpcException({
@@ -84,10 +80,7 @@ export class UsersService implements OnModuleInit {
     }
   }
 
-  async updateUser(
-    updateUserDto: UpdateUserDto,
-    _id: string,
-  ): Promise<UpdateUserResponse> {
+  async updateUser(updateUserDto: UpdateUserDto, _id: string): Promise<User> {
     try {
       const updatedUser = await this.userRepository.findOneAndUpdate(
         { _id },
@@ -95,11 +88,12 @@ export class UsersService implements OnModuleInit {
       );
 
       return {
-        user: {
-          id: updatedUser._id.toString(),
-          email: updatedUser.email,
-          password: updatedUser.password,
-        },
+        id: updatedUser._id.toString(),
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        email: updatedUser.email,
+        password: updatedUser.password,
+        role: updatedUser.role,
       };
     } catch (err) {
       throw new RpcException({
@@ -120,13 +114,6 @@ export class UsersService implements OnModuleInit {
         message: err.message,
       });
     }
-  }
-
-  async generateJwt(payload: {
-    sub: string;
-    username: string;
-  }): Promise<string> {
-    return this.jwtService.signAsync(payload);
   }
 
   async verifyJwt(token: string): Promise<any> {
@@ -161,8 +148,12 @@ export class UsersService implements OnModuleInit {
         });
       }
 
-      const payload = { sub: user._id.toString(), username: user.email };
-      const token = await this.generateJwt(payload);
+      const token = await this.jwtService.signAsync({
+        sub: user._id.toString(),
+        username: user.email,
+        role: user.role,
+      });
+
       return {
         token,
       };

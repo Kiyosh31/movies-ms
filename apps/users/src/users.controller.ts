@@ -1,8 +1,7 @@
-import { BadRequestException, Controller } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
   AuthenticateRequest,
-  AuthenticateResponse,
   CreateUserRequest,
   DeleteUserRequest,
   GetUserRequest,
@@ -10,6 +9,8 @@ import {
   UsersServiceController,
   UsersServiceControllerMethods,
 } from '@app/common';
+import { RpcException } from '@nestjs/microservices';
+import { status } from '@grpc/grpc-js';
 
 @Controller('users')
 @UsersServiceControllerMethods()
@@ -25,11 +26,14 @@ export class UsersController implements UsersServiceController {
   }
 
   updateUser(request: UpdateUserRequest) {
-    if (!request.user) {
-      throw new BadRequestException('Invalid user data');
+    if (!request) {
+      throw new RpcException({
+        code: status.INVALID_ARGUMENT,
+        message: 'Invalid user data',
+      });
     }
 
-    return this.usersService.updateUser(request.user, request.user.id);
+    return this.usersService.updateUser(request, request.id);
   }
 
   deleteUser(request: DeleteUserRequest) {
@@ -38,7 +42,10 @@ export class UsersController implements UsersServiceController {
 
   authenticate(request: AuthenticateRequest) {
     if (!request.email || !request.password) {
-      throw new BadRequestException('Invalid user data');
+      throw new RpcException({
+        code: status.INVALID_ARGUMENT,
+        message: 'Invalid user data',
+      });
     }
 
     return this.usersService.authenticate(request.email, request.password);

@@ -1,8 +1,11 @@
 import { Body, Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { USERS_SERVICE_NAME, UsersServiceClient } from '@app/common';
+import {
+  CreateUserRequest,
+  UpdateUserRequest,
+  USERS_SERVICE_NAME,
+  UsersServiceClient,
+} from '@app/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-seru.dto';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -15,7 +18,7 @@ export class UsersService implements OnModuleInit {
       this.client.getService<UsersServiceClient>(USERS_SERVICE_NAME);
   }
 
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateUserRequest) {
     return this.usersService.createUser(createUserDto);
   }
 
@@ -23,8 +26,8 @@ export class UsersService implements OnModuleInit {
     return this.usersService.getUser({ id });
   }
 
-  updateUser(id: string, updateUserDto: UpdateUserDto) {
-    // return this.usersService.updateUser({ id, user: updateUserDto });
+  updateUser(updateUserDto: UpdateUserRequest) {
+    return this.usersService.updateUser(updateUserDto);
   }
 
   deleteUser(id: string) {

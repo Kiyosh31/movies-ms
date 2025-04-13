@@ -27,7 +27,22 @@
       "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/gateway/tsconfig.app.json",
-        "assets": ["proto/*.proto"],
+        "assets": [
+          "proto/*.proto"
+        ],
+        "watchAssets": true
+      }
+    },
+    "movies": {
+      "type": "application",
+      "root": "apps/movies",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
+      "compilerOptions": {
+        "tsConfigPath": "apps/movies/tsconfig.app.json",
+        "assets": [
+          "proto/*.proto"
+        ],
         "watchAssets": true
       }
     },
@@ -38,7 +53,9 @@
       "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/users/tsconfig.app.json",
-        "assets": ["proto/*.proto"],
+        "assets": [
+          "proto/*.proto"
+        ],
         "watchAssets": true
       }
     }

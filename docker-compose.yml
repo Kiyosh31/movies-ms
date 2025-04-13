@@ -37,6 +37,19 @@ services:
     ports:
       - 5001:5001
 
+  movies:
+    build:
+      context: .
+      dockerfile: ./apps/movies/Dockerfile
+      target: development
+    command: 'npm run start:dev movies'
+    env_file:
+      - ./apps/movies/.env
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - 5002:5002
+
 volumes:
   mongodb_data:
     driver: local
