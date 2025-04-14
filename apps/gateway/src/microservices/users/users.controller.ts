@@ -12,12 +12,10 @@ import { UsersService } from './users.service';
 import {
   AuthenticateRequest,
   CreateUserRequest,
-  Role,
   UpdateUserRequest,
 } from '@app/common';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
-import { RolesGuard } from '../../guards/roles.guard';
-import { Roles } from '../../decorators/roles.decorator';
+import { OwnershipGuard } from '../../guards/ownership.guard';
 
 @Controller('users')
 export class UsersController {
@@ -29,14 +27,13 @@ export class UsersController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, OwnershipGuard)
   getUser(@Param('id') id: string) {
     return this.usersService.getUser(id);
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, OwnershipGuard)
   updateUser(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserRequest,
@@ -46,7 +43,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, OwnershipGuard)
   deleteUser(@Param('id') id: string) {
     return this.usersService.deleteUser(id);
   }
