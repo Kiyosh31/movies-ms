@@ -1,7 +1,14 @@
-import { DeleteMovieResponse, Movie } from '@app/common';
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  DeleteMovieResponse,
+  EVENT_CREATED_MOVIE,
+  EVENT_DELETED_MOVIE,
+  EVENT_UPDATED_MOVIE,
+  Movie,
+  NOTIFICATIONS_QUEUE_SERVICE,
+} from '@app/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { MovieRepository } from './repository/movie.repository';
-import { RpcException } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
@@ -9,9 +16,24 @@ import { MovieDocument } from './models/movie.schema';
 
 @Injectable()
 export class MoviesService implements OnModuleInit {
-  constructor(private readonly movieRepository: MovieRepository) {}
+  constructor(
+    private readonly movieRepository: MovieRepository,
+    @Inject(NOTIFICATIONS_QUEUE_SERVICE) private rabbitMqClient: ClientProxy,
+  ) {}
 
   onModuleInit() {}
+
+  mapMovieDocumentToMovie(movieDocument: MovieDocument): Movie {
+    return {
+      id: movieDocument._id.toString(),
+      title: movieDocument.title,
+      actors: movieDocument.actors,
+      director: movieDocument.director,
+      genre: movieDocument.genre,
+      rating: movieDocument.rating,
+      year: movieDocument.year,
+    };
+  }
 
   async movieExists(title: string) {
     try {
@@ -33,15 +55,12 @@ export class MoviesService implements OnModuleInit {
         createMovieDto as Omit<MovieDocument, '_id'>,
       );
 
-      return {
-        id: createdMovie._id.toString(),
-        title: createdMovie.title,
-        actors: createdMovie.actors,
-        director: createdMovie.director,
-        genre: createdMovie.genre,
-        rating: createdMovie.rating,
-        year: createdMovie.year,
-      };
+      this.rabbitMqClient.emit(
+        EVENT_CREATED_MOVIE,
+        this.mapMovieDocumentToMovie(createdMovie),
+      );
+
+      return this.mapMovieDocumentToMovie(createdMovie);
     } catch (e) {
       throw new RpcException({
         code: status.INTERNAL,
@@ -60,15 +79,7 @@ export class MoviesService implements OnModuleInit {
         });
       }
 
-      return {
-        id: foundMovie._id.toString(),
-        title: foundMovie.title,
-        actors: foundMovie.actors,
-        director: foundMovie.director,
-        genre: foundMovie.genre,
-        rating: foundMovie.rating,
-        year: foundMovie.year,
-      };
+      return this.mapMovieDocumentToMovie(foundMovie);
     } catch (e) {
       throw new RpcException({
         code: status.INTERNAL,
@@ -84,15 +95,12 @@ export class MoviesService implements OnModuleInit {
         { $set: updateMovieDto },
       );
 
-      return {
-        id: updatedMovie._id.toString(),
-        title: updatedMovie.title,
-        actors: updatedMovie.actors,
-        director: updatedMovie.director,
-        genre: updatedMovie.genre,
-        rating: updatedMovie.rating,
-        year: updatedMovie.year,
-      };
+      this.rabbitMqClient.emit(
+        EVENT_UPDATED_MOVIE,
+        this.mapMovieDocumentToMovie(updatedMovie),
+      );
+
+      return this.mapMovieDocumentToMovie(updatedMovie);
     } catch (e) {
       throw new RpcException({
         code: status.INTERNAL,
@@ -104,6 +112,8 @@ export class MoviesService implements OnModuleInit {
   async deleteMovie(_id: string): Promise<DeleteMovieResponse> {
     try {
       await this.movieRepository.findOneAndDelete({ _id });
+
+      this.rabbitMqClient.emit(EVENT_DELETED_MOVIE, { data: { id: _id } });
 
       return {};
     } catch (e) {
