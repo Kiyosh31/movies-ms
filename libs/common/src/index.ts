@@ -4,3 +4,4 @@ export * from './constants';
 export * from './decortators';
 export * from './proto-gen';
 export * from './rabbitmq';
+export * from './enums';

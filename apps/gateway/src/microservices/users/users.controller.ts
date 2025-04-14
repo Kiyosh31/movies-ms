@@ -12,10 +12,12 @@ import { UsersService } from './users.service';
 import {
   AuthenticateRequest,
   CreateUserRequest,
+  Role,
   UpdateUserRequest,
-  VerifyJwtRequest,
 } from '@app/common';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { RolesGuard } from '../../guards/roles.guard';
+import { Roles } from '../../decorators/roles.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -27,7 +29,8 @@ export class UsersController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   getUser(@Param('id') id: string) {
     return this.usersService.getUser(id);
   }

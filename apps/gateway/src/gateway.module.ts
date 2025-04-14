@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { UsersModule } from './users/users.module';
-import { MoviesModule } from './movies/movies.module';
+import { UsersModule } from './microservices/users/users.module';
+import { MoviesModule } from './microservices/movies/movies.module';
 import { LoggerModule } from '@app/common';
 
 @Module({

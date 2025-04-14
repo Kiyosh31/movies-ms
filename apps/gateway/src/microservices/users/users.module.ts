@@ -5,8 +5,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { USERS_PACKAGE_NAME, USERS_SERVICE_NAME } from '@app/common';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
-import { APP_FILTER } from '@nestjs/core';
-import { GlobalRpcExceptionFilter } from '../exceptions/rpc.exception';
 
 @Module({
   imports: [

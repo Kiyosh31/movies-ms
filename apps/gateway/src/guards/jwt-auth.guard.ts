@@ -44,7 +44,10 @@ export class JwtAuthGuard implements CanActivate {
         await this.userService.verifyJwt({ token }).toPromise();
 
       if (verificationResult && verificationResult.isValid) {
-        request['user'] = { id: verificationResult.user?.id };
+        request['user'] = {
+          id: verificationResult.user?.id,
+          role: verificationResult.user?.role,
+        };
         return true;
       } else {
         throw new UnauthorizedException('Invalid JWT token');
