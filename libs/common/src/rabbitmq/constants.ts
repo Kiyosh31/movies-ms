@@ -1,0 +1,5 @@
+export const NOTIFICATIONS_QUEUE_SERVICE = 'NOTIFICATIONS_SERVICE';
+export const NOTIFICATIONS_QUEUE = 'notifications_queue';
+export const EVENT_CREATED_USER = 'user-created';
+export const EVENT_UPDATED_USER = 'user-updated';
+export const EVENT_DELETED_USER = 'user-deleted';

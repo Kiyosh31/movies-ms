@@ -49,8 +49,14 @@ make dev
 nest g app <app name>
 ```
 
-2. Generate `controllers` and `Services` inside Gateway
+2. Generate `REST API`
 
 ```console
 nest g resource <resource name>
+```
+
+3. Generate `Controller`
+
+```console
+nest g controller <controller name>
 ```

@@ -4,6 +4,7 @@ import { UsersService } from './users.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
   DatabaseModule,
+  LoggerModule,
   USERS_PACKAGE_NAME,
   USERS_SERVICE_NAME,
 } from '@app/common';
@@ -13,6 +14,7 @@ import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { JwtModule } from '@nestjs/jwt';
+import { NOTIFICATIONS_QUEUE, NOTIFICATIONS_QUEUE_SERVICE } from '@app/common';
 
 @Module({
   imports: [
@@ -23,6 +25,7 @@ import { JwtModule } from '@nestjs/jwt';
         MONGODB_URI: Joi.string().required(),
       }),
     }),
+    LoggerModule,
     DatabaseModule,
     DatabaseModule.forFeature([
       { name: UserDocument.name, schema: UserSchema },
@@ -36,6 +39,17 @@ import { JwtModule } from '@nestjs/jwt';
             package: USERS_PACKAGE_NAME,
             protoPath: join(__dirname, '../users.proto'),
             url: configService.getOrThrow<string>('GRPC_URI'),
+          },
+        }),
+        inject: [ConfigService],
+      },
+      {
+        name: NOTIFICATIONS_QUEUE_SERVICE,
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.getOrThrow<string>('RABBITMQ_URI')],
+            queue: NOTIFICATIONS_QUEUE,
           },
         }),
         inject: [ConfigService],

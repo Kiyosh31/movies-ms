@@ -1,31 +1,59 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { UsersRepository } from './repository/users.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthenticateResponse, DeleteUserResponse, User } from '@app/common';
+import {
+  AuthenticateResponse,
+  DeleteUserResponse,
+  EVENT_DELETED_USER,
+  EVENT_UPDATED_USER,
+  User,
+} from '@app/common';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { RpcException } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
+import { EVENT_CREATED_USER, NOTIFICATIONS_QUEUE_SERVICE } from '@app/common';
+import { UserDocument } from './models/user.schema';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
   constructor(
     private readonly userRepository: UsersRepository,
     private readonly jwtService: JwtService,
+    @Inject(NOTIFICATIONS_QUEUE_SERVICE) private rabbitMqClient: ClientProxy,
   ) {}
 
   onModuleInit() {}
 
-  async userExists(email: string) {
+  mapUserDocumentToDto(user: UserDocument): User {
+    return {
+      id: user._id.toString(),
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      password: user.password,
+      role: user.role,
+    };
+  }
+
+  private handleDatabaseError(error: any): RpcException {
+    return new RpcException({
+      code: status.INTERNAL,
+      message: error.message || 'Database error occurred',
+    });
+  }
+
+  private async userExists(email: string) {
     try {
       await this.userRepository.findOne({ email });
-    } catch (e) {
+    } catch {
       return;
     }
+
     throw new RpcException({
-      code: status.ALREADY_EXISTS,
-      message: 'Email already exists',
+      code: status.INTERNAL,
+      message: '',
     });
   }
 
@@ -38,19 +66,18 @@ export class UsersService implements OnModuleInit {
         password: await bcrypt.hash(createUserDto.password, 10),
       });
 
-      return {
-        id: userCreated._id.toString(),
-        firstName: userCreated.firstName,
-        lastName: userCreated.lastName,
-        email: userCreated.email,
-        password: userCreated.password,
-        role: userCreated.role,
-      };
+      this.rabbitMqClient.emit(
+        EVENT_CREATED_USER,
+        this.mapUserDocumentToDto(userCreated),
+      );
+
+      return this.mapUserDocumentToDto(userCreated);
     } catch (err) {
-      throw new RpcException({
-        code: status.INTERNAL,
-        message: err.message,
-      });
+      if (err instanceof RpcException) {
+        throw err;
+      }
+
+      throw this.handleDatabaseError(err);
     }
   }
 
@@ -64,19 +91,13 @@ export class UsersService implements OnModuleInit {
         });
       }
 
-      return {
-        id: foundUser._id.toString(),
-        firstName: foundUser.firstName,
-        lastName: foundUser.lastName,
-        email: foundUser.email,
-        password: foundUser.password,
-        role: foundUser.role,
-      };
+      return this.mapUserDocumentToDto(foundUser);
     } catch (err) {
-      throw new RpcException({
-        code: status.INTERNAL,
-        message: err.message,
-      });
+      if (err instanceof RpcException) {
+        throw err;
+      }
+
+      throw this.handleDatabaseError(err);
     }
   }
 
@@ -87,32 +108,37 @@ export class UsersService implements OnModuleInit {
         { $set: updateUserDto },
       );
 
-      return {
-        id: updatedUser._id.toString(),
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
-        email: updatedUser.email,
-        password: updatedUser.password,
-        role: updatedUser.role,
-      };
+      this.rabbitMqClient.emit(
+        EVENT_UPDATED_USER,
+        this.mapUserDocumentToDto(updatedUser),
+      );
+
+      return this.mapUserDocumentToDto(updatedUser);
     } catch (err) {
-      throw new RpcException({
-        code: status.INTERNAL,
-        message: err.message,
-      });
+      if (err instanceof RpcException) {
+        throw err;
+      }
+
+      throw this.handleDatabaseError(err);
     }
   }
 
   async deleteUser(_id: string): Promise<DeleteUserResponse> {
     try {
-      await this.userRepository.findOneAndDelete({ _id });
+      const deletedUser = await this.userRepository.findOneAndDelete({ _id });
+
+      this.rabbitMqClient.emit(
+        EVENT_DELETED_USER,
+        this.mapUserDocumentToDto(deletedUser),
+      );
 
       return {};
     } catch (err) {
-      throw new RpcException({
-        code: status.INTERNAL,
-        message: err.message,
-      });
+      if (err instanceof RpcException) {
+        throw err;
+      }
+
+      throw this.handleDatabaseError(err);
     }
   }
 
@@ -120,10 +146,11 @@ export class UsersService implements OnModuleInit {
     try {
       return await this.jwtService.verifyAsync(token);
     } catch (err) {
-      throw new RpcException({
-        code: status.INTERNAL,
-        message: err.message,
-      });
+      if (err instanceof RpcException) {
+        throw err;
+      }
+
+      throw this.handleDatabaseError(err);
     }
   }
 
@@ -158,10 +185,11 @@ export class UsersService implements OnModuleInit {
         token,
       };
     } catch (err) {
-      throw new RpcException({
-        code: status.INTERNAL,
-        message: err.message,
-      });
+      if (err instanceof RpcException) {
+        throw err;
+      }
+
+      throw this.handleDatabaseError(err);
     }
   }
 }

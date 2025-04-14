@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { GatewayModule } from './gateway.module';
 import { ConfigService } from '@nestjs/config';
 import { GrpcExceptionFilter } from './exceptions/grpc.exception';
+import { Logger } from 'nestjs-pino';
 
 const serviceName = 'Gateway';
 
@@ -11,6 +12,7 @@ async function bootstrap() {
   const port = configService.getOrThrow<number>('PORT');
 
   app.useGlobalFilters(new GrpcExceptionFilter());
+  app.useLogger(app.get(Logger));
 
   await app.listen(port);
   console.log(`[Service ${serviceName}] running on port: ${port}`);

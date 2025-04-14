@@ -5,6 +5,7 @@ import { RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
+import { MovieDocument } from './models/movie.schema';
 
 @Injectable()
 export class MoviesService implements OnModuleInit {
@@ -28,7 +29,9 @@ export class MoviesService implements OnModuleInit {
     try {
       await this.movieExists(createMovieDto.title);
 
-      const createdMovie = await this.movieRepository.create(createMovieDto);
+      const createdMovie = await this.movieRepository.create(
+        createMovieDto as Omit<MovieDocument, '_id'>,
+      );
 
       return {
         id: createdMovie._id.toString(),

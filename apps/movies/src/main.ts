@@ -4,11 +4,14 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { MoviesModule } from './movies.module';
 import { MOVIES_PACKAGE_NAME } from '@app/common';
+import { Logger } from 'nestjs-pino';
 
 const serviceName = 'Movies';
 
 async function bootstrap() {
   const app = await NestFactory.create(MoviesModule);
+  app.useLogger(app.get(Logger));
+
   const configService = app.get(ConfigService);
   const url = configService.getOrThrow<string>('GRPC_URI');
 

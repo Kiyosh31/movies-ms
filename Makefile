@@ -1,6 +1,9 @@
 dev:
 	docker compose up
 
+dev-build:
+	docker compose up --build
+
 clean:
 	@echo "Cleaning all Docker resources..."
 	docker system prune -a --volumes -f
