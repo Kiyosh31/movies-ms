@@ -13,9 +13,9 @@ import {
   AuthenticateRequest,
   CreateUserRequest,
   UpdateUserRequest,
+  VerifyJwtRequest,
 } from '@app/common';
-import { Auth } from '../decorators/user.decorator';
-import { UserOwnerGuard } from '../guards/user-owner.guard';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -27,13 +27,13 @@ export class UsersController {
   }
 
   @Get(':id')
-  @Auth()
-  // @UseGuards(UserOwnerGuard)
+  @UseGuards(JwtAuthGuard)
   getUser(@Param('id') id: string) {
     return this.usersService.getUser(id);
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   updateUser(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserRequest,
@@ -43,11 +43,12 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   deleteUser(@Param('id') id: string) {
     return this.usersService.deleteUser(id);
   }
 
-  @Post('/auth')
+  @Post('auth')
   authenticate(@Body() request: AuthenticateRequest) {
     return this.usersService.authenticate(request.email, request.password);
   }

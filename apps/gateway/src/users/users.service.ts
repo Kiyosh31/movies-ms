@@ -4,6 +4,7 @@ import {
   UpdateUserRequest,
   USERS_SERVICE_NAME,
   UsersServiceClient,
+  VerifyJwtRequest,
 } from '@app/common';
 import { ClientGrpc } from '@nestjs/microservices';
 

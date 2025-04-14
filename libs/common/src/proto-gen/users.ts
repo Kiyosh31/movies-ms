@@ -56,6 +56,15 @@ export interface AuthenticateResponse {
   token: string;
 }
 
+export interface VerifyJwtRequest {
+  token: string;
+}
+
+export interface VerifyJwtResponse {
+  isValid: boolean;
+  user: User | undefined;
+}
+
 export const USERS_PACKAGE_NAME = "users";
 
 export interface UsersServiceClient {
@@ -68,6 +77,8 @@ export interface UsersServiceClient {
   deleteUser(request: DeleteUserRequest): Observable<DeleteUserResponse>;
 
   authenticate(request: AuthenticateRequest): Observable<AuthenticateResponse>;
+
+  verifyJwt(request: VerifyJwtRequest): Observable<VerifyJwtResponse>;
 }
 
 export interface UsersServiceController {
@@ -84,11 +95,13 @@ export interface UsersServiceController {
   authenticate(
     request: AuthenticateRequest,
   ): Promise<AuthenticateResponse> | Observable<AuthenticateResponse> | AuthenticateResponse;
+
+  verifyJwt(request: VerifyJwtRequest): Promise<VerifyJwtResponse> | Observable<VerifyJwtResponse> | VerifyJwtResponse;
 }
 
 export function UsersServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["createUser", "getUser", "updateUser", "deleteUser", "authenticate"];
+    const grpcMethods: string[] = ["createUser", "getUser", "updateUser", "deleteUser", "authenticate", "verifyJwt"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("UsersService", method)(constructor.prototype[method], method, descriptor);

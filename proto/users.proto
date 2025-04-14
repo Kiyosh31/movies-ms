@@ -7,6 +7,7 @@ service UsersService {
   rpc UpdateUser(UpdateUserRequest) returns (User) {}
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {}
   rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
+  rpc VerifyJwt (VerifyJwtRequest) returns (VerifyJwtResponse) {}
 }
 
 message User {
@@ -50,4 +51,12 @@ message AuthenticateRequest{
 }
 message AuthenticateResponse{
   string token = 1;
+}
+
+message VerifyJwtRequest {
+  string token = 1;
+}
+message VerifyJwtResponse {
+  bool isValid = 1;
+  User user = 2;
 }

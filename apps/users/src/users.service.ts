@@ -8,6 +8,7 @@ import {
   EVENT_DELETED_USER,
   EVENT_UPDATED_USER,
   User,
+  VerifyJwtResponse,
 } from '@app/common';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
@@ -15,10 +16,12 @@ import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
 import { EVENT_CREATED_USER, NOTIFICATIONS_QUEUE_SERVICE } from '@app/common';
 import { UserDocument } from './models/user.schema';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
   constructor(
+    private readonly configService: ConfigService,
     private readonly userRepository: UsersRepository,
     private readonly jwtService: JwtService,
     @Inject(NOTIFICATIONS_QUEUE_SERVICE) private rabbitMqClient: ClientProxy,
@@ -52,8 +55,8 @@ export class UsersService implements OnModuleInit {
     }
 
     throw new RpcException({
-      code: status.INTERNAL,
-      message: '',
+      code: status.ALREADY_EXISTS,
+      message: 'User already exists',
     });
   }
 
@@ -142,18 +145,6 @@ export class UsersService implements OnModuleInit {
     }
   }
 
-  async verifyJwt(token: string): Promise<any> {
-    try {
-      return await this.jwtService.verifyAsync(token);
-    } catch (err) {
-      if (err instanceof RpcException) {
-        throw err;
-      }
-
-      throw this.handleDatabaseError(err);
-    }
-  }
-
   async authenticate(
     email: string,
     password: string,
@@ -190,6 +181,29 @@ export class UsersService implements OnModuleInit {
       }
 
       throw this.handleDatabaseError(err);
+    }
+  }
+
+  async verifyJwt(token: string): Promise<VerifyJwtResponse> {
+    const secret = this.configService.getOrThrow<string>('JWT_SECRET');
+    if (!secret) {
+      console.error('JWT_SECRET no configurado en el User Service');
+      return { isValid: false, user: undefined };
+    }
+
+    try {
+      const decoded = await this.jwtService.verify(token, { secret });
+
+      const user = await this.userRepository.findOne({ _id: decoded.sub });
+      return {
+        isValid: true,
+        user: this.mapUserDocumentToDto(user),
+      };
+    } catch {
+      return {
+        isValid: false,
+        user: undefined,
+      };
     }
   }
 }

@@ -1,18 +1,29 @@
 import {
-  Injectable,
+  USERS_SERVICE_NAME,
+  UsersServiceClient,
+  VerifyJwtResponse,
+} from '@app/common';
+import {
   CanActivate,
   ExecutionContext,
+  Inject,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service'; // Assuming you have a UsersService
+import { ClientGrpc } from '@nestjs/microservices';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
+  private userService: UsersServiceClient;
+
   constructor(
-    private readonly jwtService: JwtService,
-    private readonly usersService: UsersService,
+    @Inject(USERS_SERVICE_NAME) private readonly client: ClientGrpc,
   ) {}
+
+  onModuleInit() {
+    this.userService =
+      this.client.getService<UsersServiceClient>(USERS_SERVICE_NAME);
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -22,20 +33,24 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('Invalid authorization header');
     }
 
-    const token = authHeader.split(' ')[1];
+    const token = authHeader.substring(7); // Extract the token
+
+    if (!token) {
+      throw new UnauthorizedException('No JWT token provided');
+    }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token);
-      const user = this.usersService.getUser(payload.sub);
+      const verificationResult: VerifyJwtResponse | undefined =
+        await this.userService.verifyJwt({ token }).toPromise();
 
-      if (!user) {
-        throw new UnauthorizedException('User not found');
+      if (verificationResult && verificationResult.isValid) {
+        request['user'] = { id: verificationResult.user?.id };
+        return true;
+      } else {
+        throw new UnauthorizedException('Invalid JWT token');
       }
-
-      request['user'] = user; // Attach user to request
-      return true;
     } catch (err) {
-      throw new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException(err);
     }
   }
 }

@@ -8,6 +8,7 @@ import {
   UpdateUserRequest,
   UsersServiceController,
   UsersServiceControllerMethods,
+  VerifyJwtRequest,
 } from '@app/common';
 import { RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
@@ -49,5 +50,9 @@ export class UsersController implements UsersServiceController {
     }
 
     return this.usersService.authenticate(request.email, request.password);
+  }
+
+  verifyJwt(request: VerifyJwtRequest) {
+    return this.usersService.verifyJwt(request.token);
   }
 }

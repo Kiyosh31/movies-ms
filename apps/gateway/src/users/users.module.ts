@@ -4,8 +4,9 @@ import { UsersController } from './users.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { USERS_PACKAGE_NAME, USERS_SERVICE_NAME } from '@app/common';
 import { join } from 'path';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
+import { GlobalRpcExceptionFilter } from '../exceptions/rpc.exception';
 
 @Module({
   imports: [
@@ -23,16 +24,6 @@ import { JwtModule } from '@nestjs/jwt';
         inject: [ConfigService],
       },
     ]),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.getOrThrow<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: configService.getOrThrow<string>('JWT_EXPIRE'),
-        },
-      }),
-    }),
   ],
   controllers: [UsersController],
   providers: [UsersService],

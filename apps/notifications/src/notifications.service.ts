@@ -2,17 +2,38 @@ import { Injectable } from '@nestjs/common';
 import { NotificationRepository } from './repository/notification.repository';
 import { NotificationDocument } from './models/notifications.schema';
 
+interface UserEventPayload {
+  id: string;
+  [key: string]: any; // Allow other properties in the payload
+}
+
 @Injectable()
 export class NotificationsService {
   constructor(
     private readonly notificationRepository: NotificationRepository,
   ) {}
 
-  async handleUserCreated(data: any) {
+  private async createNotification(
+    userId: string,
+    message: string,
+    data: any,
+  ): Promise<void> {
     await this.notificationRepository.create({
-      userId: data.id,
-      message: 'user created succesfully',
+      userId,
+      message,
       data,
     } as Omit<NotificationDocument, '_id'>);
+  }
+
+  async handleUserCreated(data: UserEventPayload): Promise<void> {
+    await this.createNotification(data.id, 'user created successfully', data);
+  }
+
+  async handleUserUpdated(data: UserEventPayload): Promise<void> {
+    await this.createNotification(data.id, 'user updated successfully', data);
+  }
+
+  async handleUserDeleted(data: UserEventPayload): Promise<void> {
+    await this.createNotification(data.id, 'user deleted successfully', data);
   }
 }
