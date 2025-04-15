@@ -58,7 +58,6 @@ export class CardsService implements OnModuleInit {
     });
   }
 
-  // Your correctly implemented userExists function:
   private async userExists(id: string): Promise<void> {
     try {
       await this.usersService.getUser({ id }).toPromise();
@@ -113,6 +112,10 @@ export class CardsService implements OnModuleInit {
 
   async updateCard(updateCardDto: UpdateCardDto, _id: string): Promise<Card> {
     try {
+      if (updateCardDto.userId) {
+        await this.userExists(updateCardDto.userId);
+      }
+
       const updatedCard = await this.cardRepository.findOneAndUpdate(
         { _id },
         { $set: updateCardDto },

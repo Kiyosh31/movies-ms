@@ -43,7 +43,7 @@ make dev
 
 # Nestjs Commands
 
-1. Generate a new microservice
+1. Generate a `new microservice`
 
 ```console
 nest g app <app name>

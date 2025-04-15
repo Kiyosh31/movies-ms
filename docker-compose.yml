@@ -39,6 +39,7 @@ services:
       - users
       - movies
       - notifications
+      - payments
 
   users:
     container_name: users
@@ -88,6 +89,23 @@ services:
       - .:/usr/src/app
     ports:
       - 3001:3001
+    depends_on:
+      - mongodb
+      - rabbitmq
+
+  payments:
+    container_name: payments
+    build:
+      context: .
+      dockerfile: ./apps/payments/Dockerfile
+      target: development
+    command: 'npm run start:dev payments'
+    env_file:
+      - ./apps/payments/.env
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - 5004:5004
     depends_on:
       - mongodb
       - rabbitmq

@@ -24,13 +24,13 @@ export class CardsController {
   }
 
   @Get(':id')
-  @UseGuards(OwnershipGuard)
+  // @UseGuards(OwnershipGuard)
   getCard(@Param('id') id: string) {
     return this.cardsService.getCard(id);
   }
 
   @Patch(':id')
-  @UseGuards(OwnershipGuard)
+  // @UseGuards(OwnershipGuard)
   updateCard(
     @Param('id') id: string,
     @Body() updateCardDto: UpdateCardRequest,
@@ -40,7 +40,7 @@ export class CardsController {
   }
 
   @Delete(':id')
-  @UseGuards(OwnershipGuard)
+  // @UseGuards(OwnershipGuard)
   deleteCard(@Param('id') id: string) {
     return this.cardsService.deleteCard(id);
   }
