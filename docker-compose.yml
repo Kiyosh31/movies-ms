@@ -40,6 +40,7 @@ services:
       - movies
       - notifications
       - payments
+      - orders
 
   users:
     container_name: users
@@ -106,6 +107,23 @@ services:
       - .:/usr/src/app
     ports:
       - 5004:5004
+    depends_on:
+      - mongodb
+      - rabbitmq
+
+  orders:
+    container_name: orders
+    build:
+      context: .
+      dockerfile: ./apps/orders/Dockerfile
+      target: development
+    command: 'npm run start:dev orders'
+    env_file:
+      - ./apps/orders/.env
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - 5005:5005
     depends_on:
       - mongodb
       - rabbitmq

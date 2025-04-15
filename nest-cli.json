@@ -59,13 +59,30 @@
         "watchAssets": true
       }
     },
+    "orders": {
+      "type": "application",
+      "root": "apps/orders",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
+      "compilerOptions": {
+        "tsConfigPath": "apps/orders/tsconfig.app.json",
+        "assets": [
+          "proto/*.proto"
+        ],
+        "watchAssets": true
+      }
+    },
     "payments": {
       "type": "application",
       "root": "apps/payments",
-      "entryFile": "main",
-      "sourceRoot": "apps/payments/src",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
       "compilerOptions": {
-        "tsConfigPath": "apps/payments/tsconfig.app.json"
+        "tsConfigPath": "apps/payments/tsconfig.app.json",
+        "assets": [
+          "proto/*.proto"
+        ],
+        "watchAssets": true
       }
     },
     "users": {

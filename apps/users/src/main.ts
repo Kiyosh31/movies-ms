@@ -3,7 +3,6 @@ import { NestFactory } from '@nestjs/core';
 import { join } from 'path';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { CARDS_PACKAGE_NAME, USERS_PACKAGE_NAME } from '@app/common';
-import { ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
 import { UsersModule } from './services/users/users.module';
 import { CardsModule } from './services/cards/cards.module';
