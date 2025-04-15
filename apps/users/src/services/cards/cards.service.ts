@@ -1,8 +1,10 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { CreateCardDto, UpdateCardDto } from '@app/common';
+
 import {
   Card,
+  CreateCardRequest,
   DeleteCardResponse,
+  UpdateCardRequest,
   USERS_SERVICE_NAME,
   UsersServiceClient,
 } from '@app/common';
@@ -65,14 +67,14 @@ export class CardsService implements OnModuleInit {
         throw error;
       } else {
         throw new RpcException({
-          code: status.UNAVAILABLE, // Or another appropriate error code
-          message: 'Failed to check user existence',
+          code: status.UNAVAILABLE,
+          message: 'User does not exist',
         });
       }
     }
   }
 
-  async createCard(CreateCardDto: CreateCardDto): Promise<Card> {
+  async createCard(CreateCardDto: CreateCardRequest): Promise<Card> {
     try {
       await this.userExists(CreateCardDto.userId);
       await this.cardExists(CreateCardDto.number);
@@ -109,15 +111,15 @@ export class CardsService implements OnModuleInit {
     }
   }
 
-  async updateCard(updateCardDto: UpdateCardDto, _id: string): Promise<Card> {
+  async updateCard(updateCardRequest: UpdateCardRequest): Promise<Card> {
     try {
-      if (updateCardDto.userId) {
-        await this.userExists(updateCardDto.userId);
+      if (updateCardRequest.userId !== undefined) {
+        await this.userExists(updateCardRequest.userId);
       }
 
       const updatedCard = await this.cardRepository.findOneAndUpdate(
-        { _id },
-        { $set: updateCardDto },
+        { _id: updateCardRequest.id },
+        { $set: updateCardRequest },
       );
 
       return this.mapCardDocumentToDto(updatedCard);

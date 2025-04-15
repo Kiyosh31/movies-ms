@@ -33,11 +33,11 @@ export interface GetUserRequest {
 
 export interface UpdateUserRequest {
   id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  role: string;
+  firstName?: string | undefined;
+  lastName?: string | undefined;
+  email?: string | undefined;
+  password?: string | undefined;
+  role?: string | undefined;
 }
 
 export interface DeleteUserRequest {

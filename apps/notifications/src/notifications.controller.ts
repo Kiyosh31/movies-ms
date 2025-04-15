@@ -3,6 +3,7 @@ import { NotificationsService } from './notifications.service';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import {
   EVENT_CREATED_MOVIE,
+  EVENT_CREATED_ORDER,
   EVENT_CREATED_USER,
   EVENT_DELETED_MOVIE,
   EVENT_DELETED_USER,
@@ -44,5 +45,11 @@ export class NotificationsController {
   @EventPattern(EVENT_DELETED_MOVIE)
   async handleMovieDeleted(@Payload() data: any) {
     await this.notificationsService.handleMovieDeleted(data);
+  }
+
+  // Orders
+  @EventPattern(EVENT_CREATED_ORDER)
+  async handleOrderCreated(@Payload() data: any) {
+    await this.notificationsService.handleOrderCreated(data);
   }
 }

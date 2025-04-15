@@ -48,4 +48,8 @@ export class NotificationsService {
   async handleMovieDeleted(data: EventPayload): Promise<void> {
     await this.createNotification(data.id, 'movie deleted successfully', data);
   }
+
+  async handleOrderCreated(data: EventPayload): Promise<void> {
+    await this.createNotification(data.id, 'order created successfully', data);
+  }
 }

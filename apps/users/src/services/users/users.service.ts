@@ -1,6 +1,6 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { UsersRepository } from './repository/users.repository';
-import { CreateUserDto, UpdateUserDto } from '@app/common';
+import { CreateUserRequest, UpdateUserRequest } from '@app/common';
 import {
   AuthenticateResponse,
   DeleteUserResponse,
@@ -59,13 +59,13 @@ export class UsersService implements OnModuleInit {
     });
   }
 
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
+  async createUser(createUserRequest: CreateUserRequest): Promise<User> {
     try {
-      await this.userExists(createUserDto.email);
+      await this.userExists(createUserRequest.email);
 
       const userCreated = await this.userRepository.create({
-        ...createUserDto,
-        password: await bcrypt.hash(createUserDto.password, 10),
+        ...createUserRequest,
+        password: await bcrypt.hash(createUserRequest.password, 10),
       });
 
       this.rabbitMqClient.emit(
@@ -103,10 +103,10 @@ export class UsersService implements OnModuleInit {
     }
   }
 
-  async updateUser(updateUserDto: UpdateUserDto, _id: string): Promise<User> {
+  async updateUser(updateUserDto: UpdateUserRequest): Promise<User> {
     try {
       const updatedUser = await this.userRepository.findOneAndUpdate(
-        { _id },
+        { _id: updateUserDto.id },
         { $set: updateUserDto },
       );
 

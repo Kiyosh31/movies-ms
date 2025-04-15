@@ -1,5 +1,6 @@
 import { Body, Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import {
+  AuthenticateRequest,
   CreateUserRequest,
   UpdateUserRequest,
   USERS_SERVICE_NAME,
@@ -18,7 +19,7 @@ export class UsersService implements OnModuleInit {
       this.client.getService<UsersServiceClient>(USERS_SERVICE_NAME);
   }
 
-  create(@Body() createUserDto: CreateUserRequest) {
+  createUser(@Body() createUserDto: CreateUserRequest) {
     return this.usersService.createUser(createUserDto);
   }
 
@@ -34,7 +35,7 @@ export class UsersService implements OnModuleInit {
     return this.usersService.deleteUser({ id });
   }
 
-  authenticate(email: string, password: string) {
-    return this.usersService.authenticate({ email, password });
+  authenticate(request: AuthenticateRequest) {
+    return this.usersService.authenticate(request);
   }
 }

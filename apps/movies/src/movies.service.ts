@@ -1,5 +1,5 @@
 import {
-  CreateMovieDto,
+  CreateMovieRequest,
   DeleteMovieResponse,
   EVENT_CREATED_MOVIE,
   EVENT_DELETED_MOVIE,
@@ -12,7 +12,7 @@ import { MovieRepository } from './repository/movie.repository';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
 import { MovieDocument } from './models/movie.schema';
-import { UpdateMovieDto } from '@app/common/dtos/movies/update-movie.dto';
+import { UpdateMovieDto } from 'apps/gateway/src/services/movies/dto/update-movie.dto';
 
 @Injectable()
 export class MoviesService implements OnModuleInit {
@@ -48,7 +48,7 @@ export class MoviesService implements OnModuleInit {
     });
   }
 
-  async createMovie(createMovieDto: CreateMovieDto): Promise<Movie> {
+  async createMovie(createMovieDto: CreateMovieRequest): Promise<Movie> {
     try {
       await this.movieExists(createMovieDto.title);
 

@@ -37,14 +37,14 @@ export interface GetCardRequest {
 
 export interface UpdateCardRequest {
   id: string;
-  cardName: string;
-  number: number;
-  expMonth: number;
-  expYear: number;
-  cvc: number;
-  cardType: string;
-  type: string;
-  userId: string;
+  cardName?: string | undefined;
+  number?: number | undefined;
+  expMonth?: number | undefined;
+  expYear?: number | undefined;
+  cvc?: number | undefined;
+  cardType?: string | undefined;
+  type?: string | undefined;
+  userId?: string | undefined;
 }
 
 export interface DeleteCardRequest {

@@ -35,13 +35,13 @@ export interface GetMovieRequest {
 
 export interface UpdateMovieRequest {
   id: string;
-  title: string;
-  director: string;
-  year: number;
+  title?: string | undefined;
+  director?: string | undefined;
+  year?: number | undefined;
   actors: string[];
-  genre: string;
-  rating: number;
-  price: number;
+  genre?: string | undefined;
+  rating?: number | undefined;
+  price?: number | undefined;
 }
 
 export interface DeleteMovieRequest {

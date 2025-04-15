@@ -1,13 +1,14 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { OrderRepository } from './repository/orders.repository';
 import {
+  CreateOrderRequest,
   EVENT_CREATED_ORDER,
   NOTIFICATIONS_QUEUE_SERVICE,
   Order,
 } from '@app/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { OrderDocument } from './models/orders.schema';
-import { CreateOrderDto } from '@app/common';
+
 import { status } from '@grpc/grpc-js';
 
 @Injectable()
@@ -33,7 +34,7 @@ export class OrdersService implements OnModuleInit {
     };
   }
 
-  async createOrder(createOrderDto: CreateOrderDto) {
+  async createOrder(createOrderDto: CreateOrderRequest) {
     try {
       const createdOrder = await this.orderRepository.create(
         createOrderDto as Omit<OrderDocument, '_id'>,

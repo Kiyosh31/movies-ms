@@ -37,14 +37,14 @@ message GetCardRequest {
 
 message UpdateCardRequest {
   string id = 1;
-  string cardName = 2;
-  int32 number = 3;
-  int32 expMonth = 4;
-  int32 expYear = 5;
-  int32 cvc = 6;
-  string cardType = 7;
-  string type = 8;
-  string userId = 9;
+  optional string cardName = 2;
+  optional int32 number = 3;
+  optional int32 expMonth = 4;
+  optional int32 expYear = 5;
+  optional int32 cvc = 6;
+  optional string cardType = 7;
+  optional string type = 8;
+  optional string userId = 9;
 }
 
 message DeleteCardRequest {

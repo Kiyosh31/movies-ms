@@ -24,7 +24,7 @@ export class CardsController implements CardsServiceController {
   }
 
   updateCard(request: UpdateCardRequest) {
-    return this.cardsService.updateCard(request, request.id);
+    return this.cardsService.updateCard(request);
   }
 
   deleteCard(request: DeleteCardRequest) {

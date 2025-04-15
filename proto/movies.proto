@@ -35,13 +35,13 @@ message GetMovieRequest{
 
 message UpdateMovieRequest{
   string id = 1;
-  string title = 2;
-  string director = 3;
-  int32 year = 4;
+  optional string title = 2;
+  optional string director = 3;
+  optional int32 year = 4;
   repeated string actors = 5;
-  string genre = 6;
-  float rating = 7;
-  float price = 8;
+  optional string genre = 6;
+  optional float rating = 7;
+  optional float price = 8;
 }
 
 message DeleteMovieRequest{

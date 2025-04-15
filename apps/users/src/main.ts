@@ -20,6 +20,7 @@ async function bootstrap() {
       },
     },
   );
+
   usersApp.useLogger(usersApp.get(Logger));
   await usersApp.listen();
   console.log(
