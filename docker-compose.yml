@@ -53,6 +53,7 @@ services:
       - .:/usr/src/app
     ports:
       - 5001:5001
+      - 5002:5002
     depends_on:
       - mongodb
       - rabbitmq
@@ -69,7 +70,7 @@ services:
     volumes:
       - .:/usr/src/app
     ports:
-      - 5002:5002
+      - 5003:5003
     depends_on:
       - mongodb
       - rabbitmq

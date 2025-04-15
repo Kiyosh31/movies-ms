@@ -19,6 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/movies-ms/test/jest-e2e.json",
     "proto:users": "rm -rf ./libs/common/src/proto-gen/users.ts && protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./ --ts_proto_opt=nestJs=true ./proto/users.proto && mv ./proto/users.ts ./libs/common/src/proto-gen",
+    "proto:cards": "rm -rf ./libs/common/src/proto-gen/cards.ts && protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./ --ts_proto_opt=nestJs=true ./proto/cards.proto && mv ./proto/cards.ts ./libs/common/src/proto-gen",
     "proto:movies": "rm -rf ./libs/common/src/proto-gen/movies.ts && protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./ --ts_proto_opt=nestJs=true ./proto/movies.proto && mv ./proto/movies.ts ./libs/common/src/proto-gen"
   },
   "dependencies": {

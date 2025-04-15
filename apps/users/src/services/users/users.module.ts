@@ -8,9 +8,8 @@ import {
   USERS_PACKAGE_NAME,
   USERS_SERVICE_NAME,
 } from '@app/common';
-import { UserDocument, UserSchema } from './models/user.schema';
-import { UsersRepository } from './repository/users.repository';
-import * as Joi from 'joi';
+import { UserDocument, UserSchema } from '../../models/user.schema';
+import { UsersRepository } from '../../repository/users.repository';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { JwtModule } from '@nestjs/jwt';
@@ -20,10 +19,6 @@ import { NOTIFICATIONS_QUEUE, NOTIFICATIONS_QUEUE_SERVICE } from '@app/common';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      validationSchema: Joi.object({
-        PORT: Joi.number().required(),
-        MONGODB_URI: Joi.string().required(),
-      }),
     }),
     LoggerModule,
     DatabaseModule,
@@ -38,7 +33,7 @@ import { NOTIFICATIONS_QUEUE, NOTIFICATIONS_QUEUE_SERVICE } from '@app/common';
           options: {
             package: USERS_PACKAGE_NAME,
             protoPath: join(__dirname, '../users.proto'),
-            url: configService.getOrThrow<string>('GRPC_URI'),
+            url: configService.getOrThrow<string>('USERS_GRPC_URI'),
           },
         }),
         inject: [ConfigService],

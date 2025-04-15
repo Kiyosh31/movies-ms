@@ -1,0 +1,53 @@
+syntax = "proto3";
+package cards;
+
+service CardsService {
+  rpc CreateCard(CreateCardRequest) returns (Card) {}
+  rpc GetCard(GetCardRequest) returns (Card) {}
+  rpc UpdateCard(UpdateCardRequest) returns (Card) {}
+  rpc DeleteCard(DeleteCardRequest) returns (DeleteCardResponse) {}
+}
+
+message Card {
+  string id = 1;
+  string cardName = 2;
+  int32 number = 3;
+  int32 expMonth = 4;
+  int32 expYear = 5;
+  int32 cvc = 6;
+  string cardType = 7;
+  string type = 8;
+  string userId = 9;
+}
+
+message CreateCardRequest {
+  string cardName = 1;
+  int32 number = 2;
+  int32 expMonth = 3;
+  int32 expYear = 4;
+  int32 cvc = 5;
+  string cardType = 6;
+  string type = 7;
+  string userId = 8;
+}
+
+message GetCardRequest {
+  string id = 1;
+}
+
+message UpdateCardRequest {
+  string id = 1;
+  string cardName = 2;
+  int32 number = 3;
+  int32 expMonth = 4;
+  int32 expYear = 5;
+  int32 cvc = 6;
+  string cardType = 7;
+  string type = 8;
+  string userId = 9;
+}
+
+message DeleteCardRequest {
+  string id = 1;
+}
+message DeleteCardResponse {}

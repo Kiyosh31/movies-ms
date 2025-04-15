@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { UsersModule } from './microservices/users/users.module';
-import { MoviesModule } from './microservices/movies/movies.module';
+import { UsersModule } from './services/users/users.module';
+import { MoviesModule } from './services/movies/movies.module';
 import { LoggerModule } from '@app/common';
+import { CardsModule } from './services/cards/cards.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { LoggerModule } from '@app/common';
     }),
     LoggerModule,
     UsersModule,
+    CardsModule,
     MoviesModule,
   ],
   controllers: [],

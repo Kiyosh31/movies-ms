@@ -11,7 +11,6 @@ export class OwnershipGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const userIdFromParams = request.params.id; // Assuming the user ID is in the route params as 'id'
     const authenticatedUserId = request.user?.id;
-    const authenticatedUserRole = request.user?.role;
 
     if (!authenticatedUserId) {
       return false; // Should be handled by JwtAuthGuard, but for safety
