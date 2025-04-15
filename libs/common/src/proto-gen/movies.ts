@@ -16,6 +16,7 @@ export interface Movie {
   actors: string[];
   genre: string;
   rating: number;
+  price: number;
 }
 
 export interface CreateMovieRequest {
@@ -25,6 +26,7 @@ export interface CreateMovieRequest {
   actors: string[];
   genre: string;
   rating: number;
+  price: number;
 }
 
 export interface GetMovieRequest {
@@ -39,6 +41,7 @@ export interface UpdateMovieRequest {
   actors: string[];
   genre: string;
   rating: number;
+  price: number;
 }
 
 export interface DeleteMovieRequest {

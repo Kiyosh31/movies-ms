@@ -23,6 +23,9 @@ export class MovieDocument extends AbstractDocument {
 
   @Prop()
   rating: number;
+
+  @Prop()
+  price: number;
 }
 
 export const MovieSchema = SchemaFactory.createForClass(MovieDocument);

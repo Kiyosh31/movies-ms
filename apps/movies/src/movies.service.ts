@@ -1,4 +1,5 @@
 import {
+  CreateMovieDto,
   DeleteMovieResponse,
   EVENT_CREATED_MOVIE,
   EVENT_DELETED_MOVIE,
@@ -10,9 +11,8 @@ import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { MovieRepository } from './repository/movie.repository';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
-import { CreateMovieDto } from './dto/create-movie.dto';
-import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieDocument } from './models/movie.schema';
+import { UpdateMovieDto } from '@app/common/dtos/movies/update-movie.dto';
 
 @Injectable()
 export class MoviesService implements OnModuleInit {
@@ -32,6 +32,7 @@ export class MoviesService implements OnModuleInit {
       genre: movieDocument.genre,
       rating: movieDocument.rating,
       year: movieDocument.year,
+      price: movieDocument.price,
     };
   }
 

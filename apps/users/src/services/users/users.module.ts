@@ -8,8 +8,8 @@ import {
   USERS_PACKAGE_NAME,
   USERS_SERVICE_NAME,
 } from '@app/common';
-import { UserDocument, UserSchema } from '../../models/user.schema';
-import { UsersRepository } from '../../repository/users.repository';
+import { UserDocument, UserSchema } from './models/user.schema';
+import { UsersRepository } from './repository/users.repository';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { JwtModule } from '@nestjs/jwt';

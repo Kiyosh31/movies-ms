@@ -16,6 +16,7 @@ message Movie {
   repeated string actors = 5;
   string genre = 6;
   float rating = 7;
+  float price = 8;
 }
 
 message CreateMovieRequest{
@@ -25,6 +26,7 @@ message CreateMovieRequest{
   repeated string actors = 4;
   string genre = 5;
   float rating = 6;
+  float price = 7;
 }
 
 message GetMovieRequest{
@@ -39,6 +41,7 @@ message UpdateMovieRequest{
   repeated string actors = 5;
   string genre = 6;
   float rating = 7;
+  float price = 8;
 }
 
 message DeleteMovieRequest{

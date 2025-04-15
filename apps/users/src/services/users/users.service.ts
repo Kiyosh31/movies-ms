@@ -1,7 +1,6 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { UsersRepository } from '../../repository/users.repository';
-import { CreateUserDto } from '../../dto/create-user.dto';
-import { UpdateUserDto } from '../../dto/update-user.dto';
+import { UsersRepository } from './repository/users.repository';
+import { CreateUserDto, UpdateUserDto } from '@app/common';
 import {
   AuthenticateResponse,
   DeleteUserResponse,
@@ -15,7 +14,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
 import { EVENT_CREATED_USER, NOTIFICATIONS_QUEUE_SERVICE } from '@app/common';
-import { UserDocument } from '../../models/user.schema';
+import { UserDocument } from './models/user.schema';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()

@@ -7,7 +7,7 @@ import {
 } from '@app/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { OrderDocument } from './models/orders.schema';
-import { CreateOrderDto } from './dto/create-order.dto';
+import { CreateOrderDto } from '@app/common';
 import { status } from '@grpc/grpc-js';
 
 @Injectable()

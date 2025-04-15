@@ -9,10 +9,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { MoviesService } from './movies.service';
-import { CreateMovieRequest, Role, UpdateMovieRequest } from '@app/common';
+import { Role, UpdateMovieRequest } from '@app/common';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { RolesGuard } from '../../guards/roles.guard';
 import { Roles } from '../../decorators/roles.decorator';
+import { CreateMovieDto } from '@app/common/dtos/movies/create-movie.dto';
 
 @Controller('movies')
 @UseGuards(JwtAuthGuard)
@@ -22,7 +23,7 @@ export class MoviesController {
   @Post()
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  create(@Body() createMovieDto: CreateMovieRequest) {
+  create(@Body() createMovieDto: CreateMovieDto) {
     return this.moviesService.createMovie(createMovieDto);
   }
 

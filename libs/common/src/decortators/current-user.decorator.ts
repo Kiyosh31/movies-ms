@@ -1,5 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { UserDocument } from 'apps/users/src/models/user.schema';
+import { UserDocument } from 'apps/users/src/services/users/models/user.schema';
 
 const getCurrentUserbyContext = (context: ExecutionContext): UserDocument => {
   if (context.getType() === 'http') {

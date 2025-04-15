@@ -1,5 +1,5 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { CreateCardDto } from './dto/create-card.dto';
+import { CreateCardDto, UpdateCardDto } from '@app/common';
 import {
   Card,
   DeleteCardResponse,
@@ -10,7 +10,6 @@ import { CardsRepository } from './repository/cards.repository';
 import { ClientGrpc, RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
 import { CardDocument } from './models/card.schema';
-import { UpdateCardDto } from './dto/update-card.dto';
 
 @Injectable()
 export class CardsService implements OnModuleInit {
