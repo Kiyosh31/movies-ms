@@ -4,6 +4,7 @@ import { UsersModule } from './services/users/users.module';
 import { MoviesModule } from './services/movies/movies.module';
 import { LoggerModule } from '@app/common';
 import { CardsModule } from './services/cards/cards.module';
+import { OrdersModule } from './services/orders/orders.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CardsModule } from './services/cards/cards.module';
     UsersModule,
     CardsModule,
     MoviesModule,
+    OrdersModule,
   ],
   controllers: [],
   providers: [],

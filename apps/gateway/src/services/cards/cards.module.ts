@@ -10,9 +10,11 @@ import {
 } from '@app/common';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
+    LoggerModule,
     ClientsModule.registerAsync([
       {
         name: CARDS_SERVICE_NAME,

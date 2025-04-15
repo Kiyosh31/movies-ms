@@ -1,0 +1,39 @@
+syntax="proto3";
+package Orders;
+
+service OrdersService {
+  rpc CreateOrder(CreateOrderRequest) returns(Order) {}
+  rpc GetOrder(GetOrderRequest) returns(Order) {}
+}
+
+message Items {
+  string movieId = 1;
+  float unitPrice = 2;
+}
+
+message Order {
+  string id = 1;
+  string userId = 2;
+  string orderDate = 3;
+  float totalAmount = 4;
+  string paymentStatus = 5;
+  string paymentMethod = 6;
+  repeated Items items = 7;
+  string createdAt = 8;
+  string updatedAt = 9;
+}
+
+message CreateOrderRequest {
+  string userId = 2;
+  string orderDate = 3;
+  float totalAmount = 4;
+  string paymentStatus = 5;
+  string paymentMethod = 6;
+  repeated Items items = 7;
+  string createdAt = 8;
+  string updatedAt = 9;
+}
+
+message GetOrderRequest {
+  string id = 1;
+}

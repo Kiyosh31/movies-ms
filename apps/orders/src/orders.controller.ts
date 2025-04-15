@@ -1,12 +1,22 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { OrdersService } from './orders.service';
+import {
+  CreateOrderRequest,
+  GetOrderRequest,
+  OrdersServiceController,
+  OrdersServiceControllerMethods,
+} from '@app/common';
 
-@Controller()
-export class OrdersController {
+@Controller('orders')
+@OrdersServiceControllerMethods()
+export class OrdersController implements OrdersServiceController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @Get()
-  getHello(): string {
-    return this.ordersService.getHello();
+  createOrder(request: CreateOrderRequest) {
+    return this.ordersService.createOrder(request);
+  }
+
+  getOrder(request: GetOrderRequest) {
+    return this.ordersService.getOrder(request.id);
   }
 }

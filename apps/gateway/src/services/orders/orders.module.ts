@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { MoviesService } from './movies.service';
-import { MoviesController } from './movies.controller';
+import { OrdersService } from './orders.service';
+import { OrdersController } from './orders.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import {
-  MOVIES_PACKAGE_NAME,
-  MOVIES_SERVICE_NAME,
+  ORDERS_PACKAGE_NAME,
+  ORDERS_SERVICE_NAME,
   USERS_PACKAGE_NAME,
   USERS_SERVICE_NAME,
 } from '@app/common';
@@ -17,13 +17,13 @@ import { LoggerModule } from 'nestjs-pino';
     LoggerModule,
     ClientsModule.registerAsync([
       {
-        name: MOVIES_SERVICE_NAME,
+        name: ORDERS_SERVICE_NAME,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.GRPC,
           options: {
-            package: MOVIES_PACKAGE_NAME,
-            protoPath: join(__dirname, '../movies.proto'),
-            url: configService.getOrThrow<string>('MOVIES_GRPC_URI'),
+            package: ORDERS_PACKAGE_NAME,
+            protoPath: join(__dirname, '../orders.proto'),
+            url: configService.getOrThrow<string>('ORDERS_GRPC_URI'),
           },
         }),
         inject: [ConfigService],
@@ -42,7 +42,7 @@ import { LoggerModule } from 'nestjs-pino';
       },
     ]),
   ],
-  controllers: [MoviesController],
-  providers: [MoviesService],
+  controllers: [OrdersController],
+  providers: [OrdersService],
 })
-export class MoviesModule {}
+export class OrdersModule {}

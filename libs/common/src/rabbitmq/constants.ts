@@ -8,3 +8,5 @@ export const EVENT_DELETED_USER = 'user-deleted';
 export const EVENT_CREATED_MOVIE = 'movie-created';
 export const EVENT_UPDATED_MOVIE = 'movie-updated';
 export const EVENT_DELETED_MOVIE = 'movie-deleted';
+
+export const EVENT_CREATED_ORDER = 'order-created';
