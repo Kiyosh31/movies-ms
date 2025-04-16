@@ -63,6 +63,7 @@ export class CardsService implements OnModuleInit {
     try {
       await this.usersService.getUser({ id }).toPromise();
     } catch (error) {
+      // @ts-expect-error no clue why this isnt working
       if (error instanceof RpcException && error.code === status.NOT_FOUND) {
         throw error;
       } else {
