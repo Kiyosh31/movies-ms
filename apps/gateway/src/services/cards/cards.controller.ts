@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { CardsService } from './cards.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
@@ -15,6 +16,7 @@ import { UpdateCardDto } from './dto/update-card.dto';
 import { catchError, throwError } from 'rxjs';
 import { RpcException } from '@nestjs/microservices';
 import { UpdateCardRequest } from '@app/common';
+import { Request } from 'express';
 
 @Controller('cards')
 @UseGuards(JwtAuthGuard)
@@ -22,35 +24,50 @@ export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
 
   @Post()
-  createCard(@Body() createCardDto: CreateCardDto) {
-    return this.cardsService
-      .createCard(createCardDto)
-      .pipe(catchError((error) => throwError(() => new RpcException(error))));
+  async createCard(@Body() createCardDto: CreateCardDto, @Req() req: Request) {
+    try {
+      return await this.cardsService.createCard(createCardDto, req['user'].id);
+    } catch (err) {
+      throw new RpcException(err);
+    }
   }
 
   @Get(':id')
-  getCard(@Param('id') id: string) {
-    return this.cardsService
-      .getCard(id)
-      .pipe(catchError((error) => throwError(() => new RpcException(error))));
+  async getCard(@Param('id') id: string, @Req() req: Request) {
+    try {
+      return await this.cardsService.getCard(id, req['user'].id);
+    } catch (err) {
+      throw new RpcException(err);
+    }
   }
 
   @Patch(':id')
-  updateCard(@Param('id') id: string, @Body() updateCardDto: UpdateCardDto) {
+  async updateCard(
+    @Param('id') id: string,
+    @Body() updateCardDto: UpdateCardDto,
+    @Req() req: Request,
+  ) {
     const updateCardRequest: UpdateCardRequest = {
       ...updateCardDto,
       id,
     };
 
-    return this.cardsService
-      .updateCard(updateCardRequest)
-      .pipe(catchError((error) => throwError(() => new RpcException(error))));
+    try {
+      return await this.cardsService.updateCard(
+        updateCardRequest,
+        req['user'].id,
+      );
+    } catch (err) {
+      throw new RpcException(err);
+    }
   }
 
   @Delete(':id')
-  deleteCard(@Param('id') id: string) {
-    return this.cardsService
-      .deleteCard(id)
-      .pipe(catchError((error) => throwError(() => new RpcException(error))));
+  async deleteCard(@Param('id') id: string, @Req() req: Request) {
+    try {
+      return await this.cardsService.deleteCard(id, req['user'].id);
+    } catch (err) {
+      throw new RpcException(err);
+    }
   }
 }

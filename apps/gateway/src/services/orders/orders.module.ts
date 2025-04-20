@@ -3,6 +3,8 @@ import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import {
+  CARDS_PACKAGE_NAME,
+  CARDS_SERVICE_NAME,
   ORDERS_PACKAGE_NAME,
   ORDERS_SERVICE_NAME,
   USERS_PACKAGE_NAME,
@@ -36,6 +38,18 @@ import { LoggerModule } from 'nestjs-pino';
             package: USERS_PACKAGE_NAME,
             protoPath: join(__dirname, '../users.proto'),
             url: configService.getOrThrow<string>('USERS_GRPC_URI'),
+          },
+        }),
+        inject: [ConfigService],
+      },
+      {
+        name: CARDS_SERVICE_NAME,
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: CARDS_PACKAGE_NAME,
+            protoPath: join(__dirname, '../cards.proto'),
+            url: configService.getOrThrow<string>('CARDS_GRPC_URI'),
           },
         }),
         inject: [ConfigService],

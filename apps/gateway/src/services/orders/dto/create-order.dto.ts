@@ -1,5 +1,11 @@
-import { CreateOrderRequest } from '@app/common';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { CreateOrderRequest, PaymentStatusEnum } from '@app/common';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 class Items {
   @IsString()
@@ -18,28 +24,20 @@ export class CreateOrderDto implements CreateOrderRequest {
 
   @IsString()
   @IsNotEmpty()
-  orderDate: string;
+  cardId: string;
 
   @IsNumber()
   @IsNotEmpty()
   totalAmount: number;
 
-  @IsString()
-  @IsNotEmpty()
-  paymentStatus: string;
-
-  @IsString()
-  @IsNotEmpty()
-  paymentMethod: string;
+  @IsEnum(PaymentStatusEnum)
+  @IsOptional()
+  paymentStatus: PaymentStatusEnum;
 
   @IsNotEmpty()
   items: Items[];
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   createdAt: string;
-
-  @IsString()
-  @IsNotEmpty()
-  updatedAt: string;
 }

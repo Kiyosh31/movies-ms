@@ -38,18 +38,6 @@ import { join } from 'path';
         }),
         inject: [ConfigService],
       },
-      {
-        name: USERS_SERVICE_NAME,
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.GRPC,
-          options: {
-            package: USERS_PACKAGE_NAME,
-            protoPath: join(__dirname, '../users.proto'),
-            url: configService.getOrThrow<string>('USERS_GRPC_URI'),
-          },
-        }),
-        inject: [ConfigService],
-      },
     ]),
   ],
   controllers: [CardsController],

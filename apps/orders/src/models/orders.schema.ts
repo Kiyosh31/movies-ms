@@ -1,4 +1,4 @@
-import { AbstractDocument } from '@app/common';
+import { AbstractDocument, PaymentStatusEnum } from '@app/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export class Item {
@@ -16,27 +16,20 @@ export class OrderDocument extends AbstractDocument {
 
   @Prop()
   userId: string;
-
   @Prop()
-  orderDate: string;
+  cardId: string;
 
   @Prop()
   totalAmount: number;
 
-  @Prop()
-  paymentStatus: string;
-
-  @Prop()
-  paymentMethod: string;
+  @Prop({ type: String, enum: PaymentStatusEnum })
+  paymentStatus: PaymentStatusEnum;
 
   @Prop()
   items: Item[];
 
   @Prop()
   createdAt: string;
-
-  @Prop()
-  updatedAt: string;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(OrderDocument);

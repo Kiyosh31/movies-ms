@@ -2,19 +2,12 @@ import { Module } from '@nestjs/common';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import {
-  DatabaseModule,
-  LoggerModule,
-  USERS_PACKAGE_NAME,
-  USERS_SERVICE_NAME,
-} from '@app/common';
+import { DatabaseModule, LoggerModule } from '@app/common';
 import { UserDocument, UserSchema } from './models/user.schema';
 import { UsersRepository } from './repository/users.repository';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { join } from 'path';
 import { JwtModule } from '@nestjs/jwt';
 import { NOTIFICATIONS_QUEUE, NOTIFICATIONS_QUEUE_SERVICE } from '@app/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -27,18 +20,6 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       { name: UserDocument.name, schema: UserSchema },
     ]),
     ClientsModule.registerAsync([
-      {
-        name: USERS_SERVICE_NAME,
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.GRPC,
-          options: {
-            package: USERS_PACKAGE_NAME,
-            protoPath: join(__dirname, '../users.proto'),
-            url: configService.getOrThrow<string>('USERS_GRPC_URI'),
-          },
-        }),
-        inject: [ConfigService],
-      },
       {
         name: NOTIFICATIONS_QUEUE_SERVICE,
         useFactory: (configService: ConfigService) => ({

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
@@ -16,6 +17,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthenticateUserDto } from './dto/authenticate-user.dto';
 import { catchError, throwError } from 'rxjs';
 import { RpcException } from '@nestjs/microservices';
+import { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -23,38 +25,53 @@ export class UsersController {
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService
-      .createUser(createUserDto)
-      .pipe(catchError((error) => throwError(() => new RpcException(error))));
+    try {
+      return this.usersService.createUser(createUserDto);
+    } catch (err) {
+      throw new RpcException(err);
+    }
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  getUser(@Param('id') id: string) {
-    return this.usersService
-      .getUser(id)
-      .pipe(catchError((error) => throwError(() => new RpcException(error))));
+  async getUser(@Param('id') id: string, @Req() req: Request) {
+    try {
+      return await this.usersService.getUser(id, req['user'].id);
+    } catch (err) {
+      throw new RpcException(err);
+    }
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() req: Request,
+  ) {
     const updateUserRequest: UpdateUserRequest = {
       ...updateUserDto,
       id,
     };
 
-    return this.usersService
-      .updateUser(updateUserRequest)
-      .pipe(catchError((error) => throwError(() => new RpcException(error))));
+    try {
+      return await this.usersService.updateUser(
+        updateUserRequest,
+        req['user'].id,
+      );
+    } catch (err) {
+      throw new RpcException(err);
+    }
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  deleteUser(@Param('id') id: string) {
-    return this.usersService
-      .deleteUser(id)
-      .pipe(catchError((error) => throwError(() => new RpcException(error))));
+  async deleteUser(@Param('id') id: string, @Req() req: Request) {
+    try {
+      return await this.usersService.deleteUser(id, req['user'].id);
+    } catch (err) {
+      throw new RpcException(err);
+    }
   }
 
   @Post('auth')

@@ -24,13 +24,11 @@ export class OrdersService implements OnModuleInit {
     return {
       id: orderDocument._id.toString(),
       userId: orderDocument.userId,
-      orderDate: orderDocument.orderDate,
+      cardId: orderDocument.cardId,
       totalAmount: orderDocument.totalAmount,
       paymentStatus: orderDocument.paymentStatus,
-      paymentMethod: orderDocument.paymentMethod,
       items: orderDocument.items,
       createdAt: orderDocument.createdAt,
-      updatedAt: orderDocument.updatedAt,
     };
   }
 

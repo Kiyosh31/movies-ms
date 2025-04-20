@@ -5,25 +5,17 @@ import {
   CreateCardRequest,
   DeleteCardResponse,
   UpdateCardRequest,
-  USERS_SERVICE_NAME,
-  UsersServiceClient,
 } from '@app/common';
 import { CardsRepository } from './repository/cards.repository';
-import { ClientGrpc, RpcException } from '@nestjs/microservices';
+import { RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
 import { CardDocument } from './models/card.schema';
 
 @Injectable()
 export class CardsService implements OnModuleInit {
-  @Inject(USERS_SERVICE_NAME) private readonly usersClient: ClientGrpc;
-  private usersService: UsersServiceClient;
-
   constructor(private readonly cardRepository: CardsRepository) {}
 
-  onModuleInit() {
-    this.usersService =
-      this.usersClient.getService<UsersServiceClient>(USERS_SERVICE_NAME);
-  }
+  onModuleInit() {}
 
   private async cardExists(number: number) {
     try {
@@ -59,28 +51,11 @@ export class CardsService implements OnModuleInit {
     });
   }
 
-  private async userExists(id: string): Promise<void> {
+  async createCard(createCardRequest: CreateCardRequest): Promise<Card> {
     try {
-      await this.usersService.getUser({ id }).toPromise();
-    } catch (error) {
-      // @ts-expect-error no clue why this isnt working
-      if (error instanceof RpcException && error.code === status.NOT_FOUND) {
-        throw error;
-      } else {
-        throw new RpcException({
-          code: status.UNAVAILABLE,
-          message: 'User does not exist',
-        });
-      }
-    }
-  }
+      await this.cardExists(createCardRequest.number);
 
-  async createCard(CreateCardDto: CreateCardRequest): Promise<Card> {
-    try {
-      await this.userExists(CreateCardDto.userId);
-      await this.cardExists(CreateCardDto.number);
-
-      const createdCard = await this.cardRepository.create(CreateCardDto);
+      const createdCard = await this.cardRepository.create(createCardRequest);
 
       return this.mapCardDocumentToDto(createdCard);
     } catch (err) {
@@ -114,10 +89,6 @@ export class CardsService implements OnModuleInit {
 
   async updateCard(updateCardRequest: UpdateCardRequest): Promise<Card> {
     try {
-      if (updateCardRequest.userId !== undefined) {
-        await this.userExists(updateCardRequest.userId);
-      }
-
       const updatedCard = await this.cardRepository.findOneAndUpdate(
         { _id: updateCardRequest.id },
         { $set: updateCardRequest },

@@ -11,27 +11,32 @@ message Items {
   float unitPrice = 2;
 }
 
+message PaymentStatus {
+  enum Status {
+    PENDING = 0;
+    PROCESSING = 1;
+    SUCCEEDED = 2;
+    FAILED = 3;
+  }
+}
+
 message Order {
   string id = 1;
   string userId = 2;
-  string orderDate = 3;
+  string cardId = 3;
   float totalAmount = 4;
-  string paymentStatus = 5;
-  string paymentMethod = 6;
-  repeated Items items = 7;
-  string createdAt = 8;
-  string updatedAt = 9;
+  PaymentStatus paymentStatus = 5;
+  repeated Items items = 6;
+  string createdAt = 7;
 }
 
 message CreateOrderRequest {
   string userId = 2;
-  string orderDate = 3;
+  string cardId = 3;
   float totalAmount = 4;
-  string paymentStatus = 5;
-  string paymentMethod = 6;
-  repeated Items items = 7;
-  string createdAt = 8;
-  string updatedAt = 9;
+  PaymentStatus paymentStatus = 5;
+  repeated Items items = 6;
+  string createdAt = 7;
 }
 
 message GetOrderRequest {
