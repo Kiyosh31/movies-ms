@@ -8,6 +8,8 @@ import {
   CARDS_SERVICE_NAME,
   DatabaseModule,
   LoggerModule,
+  NOTIFICATIONS_QUEUE,
+  NOTIFICATIONS_QUEUE_SERVICE,
   USERS_PACKAGE_NAME,
   USERS_SERVICE_NAME,
 } from '@app/common';
@@ -27,13 +29,12 @@ import { join } from 'path';
     ]),
     ClientsModule.registerAsync([
       {
-        name: CARDS_SERVICE_NAME,
+        name: NOTIFICATIONS_QUEUE_SERVICE,
         useFactory: (configService: ConfigService) => ({
-          transport: Transport.GRPC,
+          transport: Transport.RMQ,
           options: {
-            package: CARDS_PACKAGE_NAME,
-            protoPath: join(__dirname, '../cards.proto'),
-            url: configService.getOrThrow<string>('CARDS_GRPC_URI'),
+            urls: [configService.getOrThrow<string>('RABBITMQ_URI')],
+            queue: NOTIFICATIONS_QUEUE,
           },
         }),
         inject: [ConfigService],

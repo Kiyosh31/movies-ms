@@ -1,11 +1,13 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { UsersRepository } from './repository/users.repository';
-import { CreateUserRequest, UpdateUserRequest } from '@app/common';
+import {
+  CreateUserRequest,
+  EVENT_CREATE_NOTIFICATION,
+  UpdateUserRequest,
+} from '@app/common';
 import {
   AuthenticateResponse,
   DeleteUserResponse,
-  EVENT_DELETED_USER,
-  EVENT_UPDATED_USER,
   User,
   VerifyJwtResponse,
 } from '@app/common';
@@ -13,9 +15,10 @@ import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
-import { EVENT_CREATED_USER, NOTIFICATIONS_QUEUE_SERVICE } from '@app/common';
+import { NOTIFICATIONS_QUEUE_SERVICE } from '@app/common';
 import { UserDocument } from './models/user.schema';
 import { ConfigService } from '@nestjs/config';
+import { CreateNotificationDto } from '@app/common';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -68,10 +71,13 @@ export class UsersService implements OnModuleInit {
         password: await bcrypt.hash(createUserRequest.password, 10),
       });
 
-      this.rabbitMqClient.emit(
-        EVENT_CREATED_USER,
-        this.mapUserDocumentToDto(userCreated),
-      );
+      const rabbitMqPayload: CreateNotificationDto = {
+        userId: userCreated._id.toString(),
+        message: 'User created',
+        data: this.mapUserDocumentToDto(userCreated),
+      };
+
+      this.rabbitMqClient.emit(EVENT_CREATE_NOTIFICATION, rabbitMqPayload);
 
       return this.mapUserDocumentToDto(userCreated);
     } catch (err) {
@@ -110,10 +116,12 @@ export class UsersService implements OnModuleInit {
         { $set: updateUserDto },
       );
 
-      this.rabbitMqClient.emit(
-        EVENT_UPDATED_USER,
-        this.mapUserDocumentToDto(updatedUser),
-      );
+      const rabbitMqPayload: CreateNotificationDto = {
+        userId: updatedUser._id.toString(),
+        message: 'User updated',
+        data: this.mapUserDocumentToDto(updatedUser),
+      };
+      this.rabbitMqClient.emit(EVENT_CREATE_NOTIFICATION, rabbitMqPayload);
 
       return this.mapUserDocumentToDto(updatedUser);
     } catch (err) {
@@ -129,10 +137,12 @@ export class UsersService implements OnModuleInit {
     try {
       const deletedUser = await this.userRepository.findOneAndDelete({ _id });
 
-      this.rabbitMqClient.emit(
-        EVENT_DELETED_USER,
-        this.mapUserDocumentToDto(deletedUser),
-      );
+      const rabbitMqPayload: CreateNotificationDto = {
+        userId: deletedUser._id.toString(),
+        message: 'User deleted',
+        data: null,
+      };
+      this.rabbitMqClient.emit(EVENT_CREATE_NOTIFICATION, rabbitMqPayload);
 
       return {};
     } catch (err) {

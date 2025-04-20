@@ -1,9 +1,8 @@
 import {
   CreateMovieRequest,
+  CreateNotificationDto,
   DeleteMovieResponse,
-  EVENT_CREATED_MOVIE,
-  EVENT_DELETED_MOVIE,
-  EVENT_UPDATED_MOVIE,
+  EVENT_CREATE_NOTIFICATION,
   Movie,
   NOTIFICATIONS_QUEUE_SERVICE,
 } from '@app/common';
@@ -56,10 +55,12 @@ export class MoviesService implements OnModuleInit {
         createMovieDto as Omit<MovieDocument, '_id'>,
       );
 
-      this.rabbitMqClient.emit(
-        EVENT_CREATED_MOVIE,
-        this.mapMovieDocumentToMovie(createdMovie),
-      );
+      const rabbitMqPayload: CreateNotificationDto = {
+        userId: 'asd',
+        message: 'Movie created',
+        data: this.mapMovieDocumentToMovie(createdMovie),
+      };
+      this.rabbitMqClient.emit(EVENT_CREATE_NOTIFICATION, rabbitMqPayload);
 
       return this.mapMovieDocumentToMovie(createdMovie);
     } catch (e) {
@@ -96,10 +97,12 @@ export class MoviesService implements OnModuleInit {
         { $set: updateMovieDto },
       );
 
-      this.rabbitMqClient.emit(
-        EVENT_UPDATED_MOVIE,
-        this.mapMovieDocumentToMovie(updatedMovie),
-      );
+      const rabbitMqPayload: CreateNotificationDto = {
+        userId: updatedMovie._id.toHexString(),
+        message: 'Movie updated',
+        data: this.mapMovieDocumentToMovie(updatedMovie),
+      };
+      this.rabbitMqClient.emit(EVENT_CREATE_NOTIFICATION, rabbitMqPayload);
 
       return this.mapMovieDocumentToMovie(updatedMovie);
     } catch (e) {
@@ -112,9 +115,14 @@ export class MoviesService implements OnModuleInit {
 
   async deleteMovie(_id: string): Promise<DeleteMovieResponse> {
     try {
-      await this.movieRepository.findOneAndDelete({ _id });
+      const deletedMovie = await this.movieRepository.findOneAndDelete({ _id });
 
-      this.rabbitMqClient.emit(EVENT_DELETED_MOVIE, { data: { id: _id } });
+      const rabbitMqPayload: CreateNotificationDto = {
+        userId: deletedMovie._id.toHexString(),
+        message: 'Movie deleted',
+        data: null,
+      };
+      this.rabbitMqClient.emit(EVENT_CREATE_NOTIFICATION, rabbitMqPayload);
 
       return {};
     } catch (e) {

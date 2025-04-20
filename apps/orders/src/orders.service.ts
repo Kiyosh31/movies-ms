@@ -1,8 +1,9 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { OrderRepository } from './repository/orders.repository';
 import {
+  CreateNotificationDto,
   CreateOrderRequest,
-  EVENT_CREATED_ORDER,
+  EVENT_CREATE_NOTIFICATION,
   NOTIFICATIONS_QUEUE_SERVICE,
   Order,
 } from '@app/common';
@@ -38,10 +39,12 @@ export class OrdersService implements OnModuleInit {
         createOrderDto as Omit<OrderDocument, '_id'>,
       );
 
-      this.rabbitMqClient.emit(
-        EVENT_CREATED_ORDER,
-        this.mapOrderDocumentToOrder(createdOrder),
-      );
+      const rabbitMqPayload: CreateNotificationDto = {
+        userId: createOrderDto.userId,
+        message: 'Order created',
+        data: this.mapOrderDocumentToOrder(createdOrder),
+      };
+      this.rabbitMqClient.emit(EVENT_CREATE_NOTIFICATION, rabbitMqPayload);
 
       return this.mapOrderDocumentToOrder(createdOrder);
     } catch (e) {
