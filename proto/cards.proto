@@ -11,10 +11,10 @@ service CardsService {
 message Card {
   string id = 1;
   string cardName = 2;
-  int32 number = 3;
+  string number = 3;
   int32 expMonth = 4;
   int32 expYear = 5;
-  int32 cvc = 6;
+  string cvc = 6;
   string cardType = 7;
   string type = 8;
   string userId = 9;
@@ -22,10 +22,10 @@ message Card {
 
 message CreateCardRequest {
   string cardName = 1;
-  int32 number = 2;
+  string number = 2;
   int32 expMonth = 3;
   int32 expYear = 4;
-  int32 cvc = 5;
+  string cvc = 5;
   string cardType = 6;
   string type = 7;
   string userId = 8;
@@ -38,10 +38,10 @@ message GetCardRequest {
 message UpdateCardRequest {
   string id = 1;
   optional string cardName = 2;
-  optional int32 number = 3;
+  optional string number = 3;
   optional int32 expMonth = 4;
   optional int32 expYear = 5;
-  optional int32 cvc = 6;
+  optional string cvc = 6;
   optional string cardType = 7;
   optional string type = 8;
   optional string userId = 9;

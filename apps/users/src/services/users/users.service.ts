@@ -3,6 +3,7 @@ import { UsersRepository } from './repository/users.repository';
 import {
   CreateUserRequest,
   EVENT_CREATE_NOTIFICATION,
+  NOTIFICATIONS_QUEUE,
   UpdateUserRequest,
 } from '@app/common';
 import {
@@ -15,7 +16,6 @@ import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
-import { NOTIFICATIONS_QUEUE_SERVICE } from '@app/common';
 import { UserDocument } from './models/user.schema';
 import { ConfigService } from '@nestjs/config';
 import { CreateNotificationDto } from '@app/common';
@@ -26,7 +26,7 @@ export class UsersService implements OnModuleInit {
     private readonly configService: ConfigService,
     private readonly userRepository: UsersRepository,
     private readonly jwtService: JwtService,
-    @Inject(NOTIFICATIONS_QUEUE_SERVICE) private rabbitMqClient: ClientProxy,
+    @Inject(NOTIFICATIONS_QUEUE) private rabbitMqClient: ClientProxy,
   ) {}
 
   onModuleInit() {}

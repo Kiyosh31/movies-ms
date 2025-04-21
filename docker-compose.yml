@@ -106,7 +106,7 @@ services:
     volumes:
       - .:/usr/src/app
     ports:
-      - 5004:5004
+      - 3002:3002
     depends_on:
       - mongodb
       - rabbitmq

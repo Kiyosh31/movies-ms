@@ -7,7 +7,7 @@ import { UserDocument, UserSchema } from './models/user.schema';
 import { UsersRepository } from './repository/users.repository';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { JwtModule } from '@nestjs/jwt';
-import { NOTIFICATIONS_QUEUE, NOTIFICATIONS_QUEUE_SERVICE } from '@app/common';
+import { NOTIFICATIONS_QUEUE } from '@app/common';
 
 @Module({
   imports: [
@@ -21,7 +21,7 @@ import { NOTIFICATIONS_QUEUE, NOTIFICATIONS_QUEUE_SERVICE } from '@app/common';
     ]),
     ClientsModule.registerAsync([
       {
-        name: NOTIFICATIONS_QUEUE_SERVICE,
+        name: NOTIFICATIONS_QUEUE,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.RMQ,
           options: {

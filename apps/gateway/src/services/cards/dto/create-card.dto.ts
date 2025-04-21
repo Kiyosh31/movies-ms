@@ -12,7 +12,7 @@ export class CreateCardDto implements CreateCardRequest {
 
   @IsNumber()
   @IsNotEmpty()
-  number!: number;
+  number!: string;
 
   @IsNumber()
   @IsNotEmpty()
@@ -24,7 +24,7 @@ export class CreateCardDto implements CreateCardRequest {
 
   @IsNumber()
   @IsNotEmpty()
-  cvc!: number;
+  cvc!: string;
 
   @IsString()
   @IsNotEmpty()

@@ -11,7 +11,7 @@ export class CardDocument extends AbstractDocument {
   cardName!: string;
 
   @Prop({ required: true })
-  number!: number;
+  number!: string;
 
   @Prop({ required: true })
   @Min(1)
@@ -24,7 +24,7 @@ export class CardDocument extends AbstractDocument {
   expYear!: number;
 
   @Prop({ required: true })
-  cvc!: number;
+  cvc!: string;
 
   @Prop({ default: 'credit', enum: ['credit', 'debit'] })
   cardType: string;

@@ -3,19 +3,9 @@ import { CardsService } from './cards.service';
 import { CardsController } from './cards.controller';
 import { CardsRepository } from './repository/cards.repository';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import {
-  CARDS_PACKAGE_NAME,
-  CARDS_SERVICE_NAME,
-  DatabaseModule,
-  LoggerModule,
-  NOTIFICATIONS_QUEUE,
-  NOTIFICATIONS_QUEUE_SERVICE,
-  USERS_PACKAGE_NAME,
-  USERS_SERVICE_NAME,
-} from '@app/common';
+import { DatabaseModule, LoggerModule, NOTIFICATIONS_QUEUE } from '@app/common';
 import { CardDocument, CardSchema } from './models/card.schema';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { join } from 'path';
 
 @Module({
   imports: [
@@ -29,7 +19,7 @@ import { join } from 'path';
     ]),
     ClientsModule.registerAsync([
       {
-        name: NOTIFICATIONS_QUEUE_SERVICE,
+        name: NOTIFICATIONS_QUEUE,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.RMQ,
           options: {

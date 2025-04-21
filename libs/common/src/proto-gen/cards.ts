@@ -11,10 +11,10 @@ import { Observable } from 'rxjs';
 export interface Card {
   id: string;
   cardName: string;
-  number: number;
+  number: string;
   expMonth: number;
   expYear: number;
-  cvc: number;
+  cvc: string;
   cardType: string;
   type: string;
   userId: string;
@@ -22,10 +22,10 @@ export interface Card {
 
 export interface CreateCardRequest {
   cardName: string;
-  number: number;
+  number: string;
   expMonth: number;
   expYear: number;
-  cvc: number;
+  cvc: string;
   cardType: string;
   type: string;
   userId: string;
@@ -38,10 +38,10 @@ export interface GetCardRequest {
 export interface UpdateCardRequest {
   id: string;
   cardName?: string | undefined;
-  number?: number | undefined;
+  number?: string | undefined;
   expMonth?: number | undefined;
   expYear?: number | undefined;
-  cvc?: number | undefined;
+  cvc?: string | undefined;
   cardType?: string | undefined;
   type?: string | undefined;
   userId?: string | undefined;

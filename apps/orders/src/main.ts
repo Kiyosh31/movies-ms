@@ -4,7 +4,7 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
 import { OrdersModule } from './orders.module';
-import { ORDERS_PACKAGE_NAME } from '@app/common';
+import { ORDERS_PACKAGE_NAME, PAYMENTS_QUEUE } from '@app/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(OrdersModule);
@@ -25,6 +25,20 @@ async function bootstrap() {
 
   await microserviceApp.listen();
   console.log(`[Service Orders] is listening on port ${url}`);
+
+  const msApp = await NestFactory.createMicroservice<MicroserviceOptions>(
+    OrdersModule,
+    {
+      transport: Transport.RMQ,
+      options: {
+        urls: [configService.getOrThrow<string>('RABBITMQ_URI')],
+        queue: PAYMENTS_QUEUE,
+      },
+    },
+  );
+
+  await msApp.listen();
+  console.log('[Service Payments] running');
 }
 
 bootstrap().catch((err) => {

@@ -4,12 +4,14 @@ import {
   CreateOrderRequest,
   ORDERS_SERVICE_NAME,
   OrdersServiceClient,
+  PaymentStatusEnum,
   USERS_SERVICE_NAME,
   UsersServiceClient,
 } from '@app/common';
 import {
   Inject,
   Injectable,
+  NotFoundException,
   OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -42,6 +44,9 @@ export class OrdersService implements OnModuleInit {
     const user = await this.usersService
       .getUser({ id: createOrderRequest.userId })
       .toPromise();
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
     if (user?.id !== jwtUserId) {
       throw new UnauthorizedException('you cannot acces this resource');
     }
@@ -49,11 +54,26 @@ export class OrdersService implements OnModuleInit {
     const card = await this.cardsService
       .getCard({ id: createOrderRequest.cardId })
       .toPromise();
+    if (!card) {
+      throw new NotFoundException('card not found');
+    }
     if (card?.userId !== jwtUserId) {
       throw new UnauthorizedException('you cannot acces this resource');
     }
 
-    return this.ordersService.createOrder(createOrderRequest);
+    const createOrderReq: CreateOrderRequest = {
+      ...createOrderRequest,
+      paymentStatus: PaymentStatusEnum.PENDING,
+      createdAt: new Date().toISOString(),
+      card: {
+        cvc: card.cvc,
+        expMonth: card.expMonth,
+        expYear: card.expYear,
+        number: card.number,
+      },
+    };
+
+    return this.ordersService.createOrder(createOrderReq);
   }
 
   async getOrder(id: string, jwtUserId: string) {

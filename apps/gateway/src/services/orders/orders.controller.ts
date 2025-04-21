@@ -9,10 +9,9 @@ import {
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
-import { CreateOrderDto } from './dto/create-order.dto';
 import { Request } from 'express';
 import { RpcException } from '@nestjs/microservices';
-import { CreateOrderRequest, PaymentStatusEnum } from '@app/common';
+import { CreateOrderDto } from '@app/common';
 
 @Controller('orders')
 @UseGuards(JwtAuthGuard)
@@ -25,14 +24,8 @@ export class OrdersController {
     @Req() req: Request,
   ) {
     try {
-      const createOrderRequest: CreateOrderRequest = {
-        ...createOrderDto,
-        paymentStatus: PaymentStatusEnum.PENDING,
-        createdAt: new Date().toISOString(),
-      };
-
       return await this.ordersService.createOrder(
-        createOrderRequest,
+        createOrderDto,
         req['user'].id,
       );
     } catch (err) {

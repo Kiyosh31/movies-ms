@@ -12,10 +12,8 @@ export class Item {
 @Schema({ versionKey: false, collection: 'orders' })
 export class OrderDocument extends AbstractDocument {
   @Prop()
-  id: string;
-
-  @Prop()
   userId: string;
+
   @Prop()
   cardId: string;
 

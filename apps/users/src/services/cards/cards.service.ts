@@ -5,7 +5,7 @@ import {
   CreateCardRequest,
   DeleteCardResponse,
   EVENT_CREATE_NOTIFICATION,
-  NOTIFICATIONS_QUEUE_SERVICE,
+  NOTIFICATIONS_QUEUE,
   UpdateCardRequest,
 } from '@app/common';
 import { CardsRepository } from './repository/cards.repository';
@@ -18,12 +18,12 @@ import { CreateNotificationDto } from '@app/common';
 export class CardsService implements OnModuleInit {
   constructor(
     private readonly cardRepository: CardsRepository,
-    @Inject(NOTIFICATIONS_QUEUE_SERVICE) private rabbitMqClient: ClientProxy,
+    @Inject(NOTIFICATIONS_QUEUE) private rabbitMqClient: ClientProxy,
   ) {}
 
   onModuleInit() {}
 
-  private async cardExists(number: number) {
+  private async cardExists(number: string) {
     try {
       await this.cardRepository.findOne({ number });
     } catch {

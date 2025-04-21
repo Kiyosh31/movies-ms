@@ -11,32 +11,31 @@ message Items {
   float unitPrice = 2;
 }
 
-message PaymentStatus {
-  enum Status {
-    PENDING = 0;
-    PROCESSING = 1;
-    SUCCEEDED = 2;
-    FAILED = 3;
-  }
-}
-
 message Order {
   string id = 1;
   string userId = 2;
   string cardId = 3;
   float totalAmount = 4;
-  PaymentStatus paymentStatus = 5;
+  string paymentStatus = 5;
   repeated Items items = 6;
   string createdAt = 7;
+}
+
+message StripeCard {
+  string cvc = 1;
+  int32 exp_month = 2;
+  int32 exp_year = 3;
+  string number = 4;
 }
 
 message CreateOrderRequest {
   string userId = 2;
   string cardId = 3;
   float totalAmount = 4;
-  PaymentStatus paymentStatus = 5;
+  string paymentStatus = 5;
   repeated Items items = 6;
   string createdAt = 7;
+  StripeCard card = 8;
 }
 
 message GetOrderRequest {

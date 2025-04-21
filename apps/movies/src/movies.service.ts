@@ -4,7 +4,7 @@ import {
   DeleteMovieResponse,
   EVENT_CREATE_NOTIFICATION,
   Movie,
-  NOTIFICATIONS_QUEUE_SERVICE,
+  NOTIFICATIONS_QUEUE,
 } from '@app/common';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { MovieRepository } from './repository/movie.repository';
@@ -17,7 +17,7 @@ import { UpdateMovieDto } from 'apps/gateway/src/services/movies/dto/update-movi
 export class MoviesService implements OnModuleInit {
   constructor(
     private readonly movieRepository: MovieRepository,
-    @Inject(NOTIFICATIONS_QUEUE_SERVICE) private rabbitMqClient: ClientProxy,
+    @Inject(NOTIFICATIONS_QUEUE) private rabbitMqClient: ClientProxy,
   ) {}
 
   onModuleInit() {}

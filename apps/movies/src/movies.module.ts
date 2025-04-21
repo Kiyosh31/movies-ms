@@ -2,12 +2,7 @@ import { Module } from '@nestjs/common';
 import { MoviesController } from './movies.controller';
 import { MoviesService } from './movies.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import {
-  DatabaseModule,
-  LoggerModule,
-  NOTIFICATIONS_QUEUE,
-  NOTIFICATIONS_QUEUE_SERVICE,
-} from '@app/common';
+import { DatabaseModule, LoggerModule, NOTIFICATIONS_QUEUE } from '@app/common';
 import { MovieDocument, MovieSchema } from './models/movie.schema';
 import { MovieRepository } from './repository/movie.repository';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -22,7 +17,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ]),
     ClientsModule.registerAsync([
       {
-        name: NOTIFICATIONS_QUEUE_SERVICE,
+        name: NOTIFICATIONS_QUEUE,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.RMQ,
           options: {

@@ -4,19 +4,26 @@ import {
   CreateNotificationDto,
   CreateOrderRequest,
   EVENT_CREATE_NOTIFICATION,
-  NOTIFICATIONS_QUEUE_SERVICE,
+  EVENT_CREATE_PAYMENT,
+  NOTIFICATIONS_QUEUE,
   Order,
+  PAYMENTS_QUEUE,
+  PaymentStatusEnum,
+  UpdateOrderDto,
 } from '@app/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { OrderDocument } from './models/orders.schema';
 
 import { status } from '@grpc/grpc-js';
+import { CreateChargeDto } from 'apps/payments/src/dto/create-charge.dto';
 
 @Injectable()
 export class OrdersService implements OnModuleInit {
   constructor(
     private readonly orderRepository: OrderRepository,
-    @Inject(NOTIFICATIONS_QUEUE_SERVICE) private rabbitMqClient: ClientProxy,
+    @Inject(NOTIFICATIONS_QUEUE)
+    private notificationsClient: ClientProxy,
+    @Inject(PAYMENTS_QUEUE) private paymentsClient: ClientProxy,
   ) {}
 
   onModuleInit() {}
@@ -33,18 +40,33 @@ export class OrdersService implements OnModuleInit {
     };
   }
 
-  async createOrder(createOrderDto: CreateOrderRequest) {
+  async createOrder(createOrderRequest: CreateOrderRequest) {
     try {
       const createdOrder = await this.orderRepository.create(
-        createOrderDto as Omit<OrderDocument, '_id'>,
+        createOrderRequest as Omit<OrderDocument, '_id'>,
       );
 
+      // create notification
       const rabbitMqPayload: CreateNotificationDto = {
-        userId: createOrderDto.userId,
-        message: 'Order created',
+        userId: createOrderRequest.userId,
+        message: 'Order created and Processing',
         data: this.mapOrderDocumentToOrder(createdOrder),
       };
-      this.rabbitMqClient.emit(EVENT_CREATE_NOTIFICATION, rabbitMqPayload);
+      this.notificationsClient.emit(EVENT_CREATE_NOTIFICATION, rabbitMqPayload);
+
+      // create the payment
+      const paymentPayload: CreateChargeDto = {
+        userId: createOrderRequest.userId,
+        orderId: createdOrder._id.toHexString(),
+        amount: createOrderRequest.totalAmount,
+        card: {
+          cvc: createOrderRequest.card?.cvc,
+          exp_month: createOrderRequest.card?.expMonth,
+          exp_year: createOrderRequest.card?.expYear,
+          number: createOrderRequest.card?.number,
+        },
+      };
+      this.paymentsClient.emit(EVENT_CREATE_PAYMENT, paymentPayload);
 
       return this.mapOrderDocumentToOrder(createdOrder);
     } catch (e) {
@@ -66,6 +88,66 @@ export class OrdersService implements OnModuleInit {
       }
 
       return this.mapOrderDocumentToOrder(foundOrder);
+    } catch (e) {
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: e.message,
+      });
+    }
+  }
+
+  async updateOrder(_id: string, updateOrderDto: UpdateOrderDto) {
+    try {
+      await this.orderRepository.findOneAndUpdate(
+        { _id },
+        { $set: updateOrderDto },
+      );
+    } catch (e) {
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: e.message,
+      });
+    }
+  }
+
+  async paymentSuccess(data: any) {
+    try {
+      const order = await this.getOrder(data.orderId);
+      const updateOrderDto: UpdateOrderDto = {
+        ...order,
+        paymentStatus: PaymentStatusEnum.SUCCEEDED,
+      };
+      await this.updateOrder(order.id, updateOrderDto);
+
+      const rabbitMqPayload: CreateNotificationDto = {
+        userId: order.userId,
+        message: 'Order complete',
+        data: order,
+      };
+      this.notificationsClient.emit(EVENT_CREATE_NOTIFICATION, rabbitMqPayload);
+    } catch (e) {
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: e.message,
+      });
+    }
+  }
+
+  async paymentFailed(data: any) {
+    try {
+      const order = await this.getOrder(data.orderId);
+      const updateOrderDto: UpdateOrderDto = {
+        ...order,
+        paymentStatus: PaymentStatusEnum.FAILED,
+      };
+      await this.updateOrder(order.id, updateOrderDto);
+
+      const rabbitMqPayload: CreateNotificationDto = {
+        userId: order.userId,
+        message: 'Order failed',
+        data: data.message,
+      };
+      this.notificationsClient.emit(EVENT_CREATE_NOTIFICATION, rabbitMqPayload);
     } catch (e) {
       throw new RpcException({
         code: status.INTERNAL,

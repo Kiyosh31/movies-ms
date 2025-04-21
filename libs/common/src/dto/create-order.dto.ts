@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -15,6 +16,24 @@ class Items {
   @IsNumber()
   @IsNotEmpty()
   unitPrice: number;
+}
+
+class StripeCard {
+  @IsString()
+  @IsNotEmpty()
+  cvc: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  expMonth: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  expYear: number;
+
+  @IsString()
+  @IsNotEmpty()
+  number: string;
 }
 
 export class CreateOrderDto implements CreateOrderRequest {
@@ -40,4 +59,8 @@ export class CreateOrderDto implements CreateOrderRequest {
   @IsString()
   @IsOptional()
   createdAt: string;
+
+  @IsObject()
+  @IsOptional()
+  card: StripeCard;
 }

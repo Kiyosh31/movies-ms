@@ -13,33 +13,31 @@ export interface Items {
   unitPrice: number;
 }
 
-export interface PaymentStatus {}
-
-export enum PaymentStatus_Status {
-  PENDING = 0,
-  PROCESSING = 1,
-  SUCCEEDED = 2,
-  FAILED = 3,
-  UNRECOGNIZED = -1,
-}
-
 export interface Order {
   id: string;
   userId: string;
   cardId: string;
   totalAmount: number;
-  paymentStatus: PaymentStatus | undefined;
+  paymentStatus: string;
   items: Items[];
   createdAt: string;
+}
+
+export interface StripeCard {
+  cvc: string;
+  expMonth: number;
+  expYear: number;
+  number: string;
 }
 
 export interface CreateOrderRequest {
   userId: string;
   cardId: string;
   totalAmount: number;
-  paymentStatus: PaymentStatus | undefined;
+  paymentStatus: string;
   items: Items[];
   createdAt: string;
+  card: StripeCard | undefined;
 }
 
 export interface GetOrderRequest {
